@@ -11,7 +11,7 @@ schoolIDs=set()
 for monthKey in chattingAllMonths:
     monthValue=chattingAllMonths[monthKey]
     for schoolID in monthValue:
-        if schoolID=='other':continue
+        if schoolID=='robot':continue
         schoolIDs.add(schoolID)
         if not schoolID in schoolID2months:schoolID2months[schoolID]={}
 
@@ -23,7 +23,7 @@ for schoolID in schoolIDs:
 for monthKey in chattingAllMonths:
     monthValue=chattingAllMonths[monthKey]
     for schoolID in monthValue:
-        if schoolID=='other':continue
+        if schoolID=='robot':continue
         schoolID2months[schoolID][monthKey]+=1
 
 def paint(schoolID):

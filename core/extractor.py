@@ -9,6 +9,10 @@ schoolID2freq:dict[str,int]={}
 schoolID2days:dict[str,list[str]]={}
 schoolID2rate:dict[str,float]={}
 
+unknown:int=0
+unknownqqs:list[str]=[]
+unknownqq2num:dict[str,int]={}
+
 timeDelta=120
 #默认如果两条消息相隔大于等于2分钟，则分属两个不同的对话part
 errorDelta=1e7
@@ -34,6 +38,16 @@ chattingEachWeek:list[str]=[]
 chattingAllWeeks:dict[str,list[str]]={}
 
 chattingAllDeltas:dict[int,int]={}
+
+def generateUnknown(unknownqq):
+    global unknown
+    if not unknownqq in unknownqqs:
+        unknown+=1
+        unknownqqs.append(unknownqq)
+        unknownqq2num[unknownqq]=unknown
+        return 'unknown'+str(unknown)
+    else:
+        return 'unknown'+str(unknownqq2num[unknownqq])
 
 def extractHead(filepath:str)->list[str]:
     with open(filepath,'r',encoding='utf-8',errors='ignore') as reader:
@@ -62,7 +76,8 @@ def extract(filepath:str):
         schoolID_raw=re.search(r'(?<=[\s】])(?:1[0-9]|2[0-5]|0[89])[1-8]\d\d',line)#发言者的学号
         #计算学号时要考虑:五位学号前两位应为08<=xx<=25,第三位由于班级个数取1-8,后两位理论上来说从01-99均有可能
         if schoolID_raw is not None:schoolID:str=schoolID_raw.group()#先确定发言者是否有学号(考虑到有机器人参与)
-        else:schoolID="other"#判断为机器人
+        elif qq=='10000':schoolID="robot"#判断为机器人
+        else:schoolID=generateUnknown(qq)
 
         if tempTime is None:
             tempTime=datetimeTime

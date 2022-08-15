@@ -15,10 +15,10 @@ for partId in range(parts):
     chattingEachPart=chattingAllTime[partId]
     considered=[]
     for schoolID in chattingEachPart:
-        if schoolID in considered or schoolID=='other':continue
+        if schoolID in considered or schoolID=='robot':continue
         considered.append(schoolID)
         for otherID in chattingEachPart:
-            if otherID==schoolID or otherID=='other':continue
+            if otherID==schoolID or otherID=='robot':continue
             if not schoolID in friends:friends[schoolID]={}
             if not otherID in friends[schoolID]:friends[schoolID][otherID]=0
             friends[schoolID][otherID]+=1

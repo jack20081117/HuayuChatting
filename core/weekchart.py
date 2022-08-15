@@ -11,7 +11,7 @@ schoolIDs=set()
 for weekKey in chattingAllWeeks:
     weekValue=chattingAllWeeks[weekKey]
     for schoolID in weekValue:
-        if schoolID=='other':continue
+        if schoolID=='robot':continue
         schoolIDs.add(schoolID)
         if not schoolID in schoolID2weeks:schoolID2weeks[schoolID]={}
 
@@ -23,7 +23,7 @@ for schoolID in schoolIDs:
 for weekKey in chattingAllWeeks:
     weekValue=chattingAllWeeks[weekKey]
     for schoolID in weekValue:
-        if schoolID=='other':continue
+        if schoolID=='robot':continue
         schoolID2weeks[schoolID][weekKey]+=1
 
 def paint(schoolID):
