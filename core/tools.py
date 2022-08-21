@@ -80,3 +80,10 @@ def sumOfValue(d:dict[str,int])->int:
     for key,value in d.items():
         sum+=value
     return sum
+
+def transferList(l:list[str],src,target)->list[str]:
+    for i in range(len(l)):
+        schoolID=l[i]
+        if schoolID==src:
+            l[i]=target
+    return l

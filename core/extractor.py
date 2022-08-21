@@ -5,13 +5,13 @@ from tools import *
 
 inputFilename='../in/华育校友营_3.txt'
 schoolID2qq:dict[str,str]={}
+qq2schoolID:dict[str,str]={}
 schoolID2freq:dict[str,int]={}
 schoolID2days:dict[str,list[str]]={}
 schoolID2rate:dict[str,float]={}
 
 unknown:int=0
 unknownqqs:list[str]=[]
-unknownqq2num:dict[str,int]={}
 
 timeDelta=120
 #默认如果两条消息相隔大于等于2分钟，则分属两个不同的对话part
@@ -41,13 +41,12 @@ chattingAllDeltas:dict[int,int]={}
 
 def generateUnknown(unknownqq):
     global unknown
-    if not unknownqq in unknownqqs:
+    if unknownqq in qq2schoolID:
+        return qq2schoolID[unknownqq]
+    else:
         unknown+=1
         unknownqqs.append(unknownqq)
-        unknownqq2num[unknownqq]=unknown
         return 'unknown'+str(unknown)
-    else:
-        return 'unknown'+str(unknownqq2num[unknownqq])
 
 def extractHead(filepath:str)->list[str]:
     with open(filepath,'r',encoding='utf-8',errors='ignore') as reader:
@@ -78,6 +77,14 @@ def extract(filepath:str):
         if schoolID_raw is not None:schoolID:str=schoolID_raw.group()#先确定发言者是否有学号(考虑到有机器人参与)
         elif qq=='10000':schoolID="robot"#判断为机器人
         else:schoolID=generateUnknown(qq)
+
+        if not(schoolID in schoolID2qq):schoolID2qq[schoolID]=qq#如果发言者之前没有在字典中对应qq号则进行设置
+        if not(qq in qq2schoolID):qq2schoolID[qq]=schoolID
+        if not(schoolID in schoolID2freq):schoolID2freq[schoolID]=0
+        if not(schoolID in schoolID2days):schoolID2days[schoolID]=[]
+        if not(date in schoolID2days[schoolID]):schoolID2days[schoolID].append(date)
+        schoolID2freq[schoolID]+=1#发言者的发言总量+1
+        schoolID2rate[schoolID]=schoolID2freq[schoolID]/len(schoolID2days[schoolID])
 
         if tempTime is None:
             tempTime=datetimeTime
@@ -118,12 +125,6 @@ def extract(filepath:str):
             chattingEachWeek.append(schoolID)
             tempWeek+=weekDelta
 
-        if not(schoolID in schoolID2qq):schoolID2qq[schoolID]=qq#如果发言者之前没有在字典中对应qq号则进行设置
-        if not(schoolID in schoolID2freq):schoolID2freq[schoolID]=0
-        if not(schoolID in schoolID2days):schoolID2days[schoolID]=[]
-        if not(date in schoolID2days[schoolID]):schoolID2days[schoolID].append(date)
-        schoolID2freq[schoolID]+=1#发言者的发言总量+1
-        schoolID2rate[schoolID]=schoolID2freq[schoolID]/len(schoolID2days[schoolID])
         length+=1
 
     chattingEndTime.append(str(tempTime))
