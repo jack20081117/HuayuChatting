@@ -4,14 +4,14 @@ logging.basicConfig(level=logging.INFO)
 from tools import *
 
 inputFilename='../in/华育校友营_3.txt'
-schoolID2qq:dict[str,str]={}
+#下面几个dict存储qq和schoolID,freq,days,rate等数据的映射关系
 qq2schoolID:dict[str,str]={}
-schoolID2freq:dict[str,int]={}
-schoolID2days:dict[str,list[str]]={}
-schoolID2rate:dict[str,float]={}
+qq2freq:dict[str,int]={}
+qq2days:dict[str,list[str]]={}
+qq2rate:dict[str,float]={}
 
-unknown:int=0
-unknownqqs:list[str]=[]
+unknown:int=0#未知学号的qq号个数
+unknownqqs:list[str]=[]#未知学号的qq号
 
 timeDelta=120
 #默认如果两条消息相隔大于等于2分钟，则分属两个不同的对话part
@@ -39,7 +39,9 @@ chattingAllWeeks:dict[str,list[str]]={}
 
 chattingAllDeltas:dict[int,int]={}
 
-def generateUnknown(unknownqq):
+def generateUnknown(unknownqq):#生成未知学号的schoolID
+    #原则上使用unknown1,unknown2等等
+    #本来想使用字母,但后来发现unknown太多了,甚至出现了希腊字母
     global unknown
     if unknownqq in qq2schoolID:
         return qq2schoolID[unknownqq]
@@ -49,6 +51,10 @@ def generateUnknown(unknownqq):
         return 'unknown'+str(unknown)
 
 def searchQQ(line:str)->str:
+    #寻找消息头中蕴含的qq号信息
+    #由于可能有部分人在昵称中加入半角括号,所以从消息头末尾开始匹配
+    #注意这里相反,是要先找下括号")"再找上括号"("
+    #结尾别忘了把找到的qq号重新倒过来
     rline=line[::-1]
     rqq=re.search(r'(?<=[)>])[^(<]+',rline).group()
     return rqq[::-1]
@@ -59,6 +65,7 @@ def extractHead(filepath:str)->list[str]:
     return re.findall(r'20[\d-]{8}\s+[\d:]{7,8}\s+[^\n]+(?:\d{5,11}|@\w+\.[comnet]{2,3})[)>]',txt)
 
 def extract(filepath:str):
+    #提取数据核心模块
     logging.info('正在提取数据......')
     global chattingEachPart,chattingAllTime,chattingStartTime,chattingEndTime
     global chattingEachMonth,chattingAllMonths
@@ -66,30 +73,32 @@ def extract(filepath:str):
     global chattingAllDeltas
 
     tempTime=None#上一次的发言时间
-    tempMonth=None
-    tempWeek=None
-    _tempTime=None
+    tempMonth=None#上一次发言所在月份
+    tempWeek=None#上一次发言所在周(或者说是7x86400秒)
+
     length=0
+
     for line in extractHead(filepath=filepath):
         time=re.search(r'20[\d-]{8}\s[\d:]{7,8}',line).group()#发言时间,YYYY-mm-dd (H)H:MM:SS
         datetimeTime=datetime.strptime(time,'%Y-%m-%d %H:%M:%S')#发言时间转化为datetime格式
-        month=re.search(r'20[\d-]{5}',time).group()
+        month=re.search(r'20[\d-]{5}',time).group()#发言月份,YYYY-mm
         date=re.search(r'20[\d-]{8}',time).group()#发言日期,YYYY-mm-dd
 
         qq=searchQQ(line)#发言者的qq号
         schoolID_raw=re.search(r'(?<=[\s】])(?:1[0-9]|2[0-5]|0[89])[1-8]\d\d',line)#发言者的学号
         #计算学号时要考虑:五位学号前两位应为08<=xx<=25,第三位由于班级个数取1-8,后两位理论上来说从01-99均有可能
         if schoolID_raw is not None:schoolID:str=schoolID_raw.group()#先确定发言者是否有学号(考虑到有机器人参与)
-        elif qq=='10000':schoolID="robot"#判断为机器人
-        else:schoolID=generateUnknown(qq)
+        elif qq=='10000':continue#判断为机器人(即自带系统消息)
+        else:schoolID=generateUnknown(qq)#生成unknown学号
 
-        if not(schoolID in schoolID2qq):schoolID2qq[schoolID]=qq#如果发言者之前没有在字典中对应qq号则进行设置
+        #如果发言者之前没有在字典中对应schoolID,qq,freq,day,rate等信息则进行设置
         if not(qq in qq2schoolID):qq2schoolID[qq]=schoolID
-        if not(schoolID in schoolID2freq):schoolID2freq[schoolID]=0
-        if not(schoolID in schoolID2days):schoolID2days[schoolID]=[]
-        if not(date in schoolID2days[schoolID]):schoolID2days[schoolID].append(date)
-        schoolID2freq[schoolID]+=1#发言者的发言总量+1
-        schoolID2rate[schoolID]=schoolID2freq[schoolID]/len(schoolID2days[schoolID])
+        if not(qq in qq2freq):qq2freq[qq]=0
+        if not(qq in qq2days):qq2days[qq]=[]
+        if not(date in qq2days[qq]):qq2days[qq].append(date)
+
+        qq2freq[qq]+=1#发言者的发言总量+1
+        qq2rate[qq]=qq2freq[qq]/len(qq2days[qq])
 
         if tempTime is None:
             tempTime=datetimeTime
@@ -140,7 +149,7 @@ def extract(filepath:str):
 
 extract(filepath=inputFilename)
 
-writeInfoByJson(schoolID2qq,schoolID2freq,schoolID2days,schoolID2rate,
+writeInfoByJson(qq2schoolID,qq2freq,qq2days,qq2rate,
                 chattingAllTime,chattingAllMonths,chattingAllWeeks,chattingStartTime,chattingEndTime,
                 timeDeltas,chattingAllDeltas)
 

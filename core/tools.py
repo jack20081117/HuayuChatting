@@ -1,18 +1,18 @@
 import json,logging
 
-def writeInfoByJson(schoolID2qq,schoolID2freq,schoolID2days,schoolID2rate,
+def writeInfoByJson(qq2schoolID,qq2freq,qq2days,qq2rate,
                     chattingAllTime,chattingAllMonths,chattingAllWeeks,chattingStartTime,chattingEndTime,
                     timeDeltas,chattingAllDeltas):
     #通过JSON向文件内写入数据
     logging.info('正在写入数据......')
-    with open('../out/schoolID2qq.txt','w') as writer:
-        json.dump(schoolID2qq,writer)
-    with open('../out/schoolID2freq.txt','w') as writer:
-        json.dump(schoolID2freq,writer)
-    with open('../out/schoolID2days.txt','w') as writer:
-        json.dump(schoolID2days,writer)
-    with open('../out/schoolID2rate.txt','w') as writer:
-        json.dump(schoolID2rate,writer)
+    with open('../out/qq2schoolID.txt','w') as writer:
+        json.dump(qq2schoolID,writer)
+    with open('../out/qq2freq.txt','w') as writer:
+        json.dump(qq2freq,writer)
+    with open('../out/qq2days.txt','w') as writer:
+        json.dump(qq2days,writer)
+    with open('../out/qq2rate.txt','w') as writer:
+        json.dump(qq2rate,writer)
     with open('../out/chattingAllTime.txt','w') as writer:
         json.dump(chattingAllTime,writer)
     with open('../out/chattingAllMonths.txt','w') as writer:
@@ -30,14 +30,14 @@ def writeInfoByJson(schoolID2qq,schoolID2freq,schoolID2days,schoolID2rate,
 def readInfoByJson()->tuple:
     #通过JSON从文件内读入数据
     logging.info('正在读入数据......')
-    with open('../out/schoolID2qq.txt','r') as reader:
-        schoolID2qq=json.load(reader)
-    with open('../out/schoolID2freq.txt','r') as reader:
-        schoolID2freq=json.load(reader)
-    with open('../out/schoolID2days.txt','r') as reader:
-        schoolID2days=json.load(reader)
-    with open('../out/schoolID2rate.txt','r') as reader:
-        schoolID2rate=json.load(reader)
+    with open('../out/qq2schoolID.txt','r') as reader:
+        qq2schoolID=json.load(reader)
+    with open('../out/qq2freq.txt','r') as reader:
+        qq2freq=json.load(reader)
+    with open('../out/qq2days.txt','r') as reader:
+        qq2days=json.load(reader)
+    with open('../out/qq2rate.txt','r') as reader:
+        qq2rate=json.load(reader)
     with open('../out/chattingAllTime.txt','r') as reader:
         chattingAllTime=json.load(reader)
     with open('../out/chattingAllMonths.txt','r') as reader:
@@ -51,7 +51,7 @@ def readInfoByJson()->tuple:
     with open('../out/chattingAllDeltas.txt','r') as reader:
         chattingAllDeltas=json.load(reader)
     logging.info('读入数据完毕')
-    return schoolID2qq,schoolID2freq,schoolID2days,schoolID2rate,\
+    return qq2schoolID,qq2freq,qq2days,qq2rate,\
            chattingAllTime,chattingAllMonths,chattingAllWeeks,chattingSTTime,\
            timeDeltas,chattingAllDeltas
 
@@ -81,9 +81,12 @@ def sumOfValue(d:dict[str,int])->int:
         sum+=value
     return sum
 
-def transferList(l:list[str],src,target)->list[str]:
+def transferList(l:list,src,target)->list[str]:
     for i in range(len(l)):
-        schoolID=l[i]
-        if schoolID==src:
-            l[i]=target
+        item=l[i]
+        if isinstance(item,list):
+            l[i]=transferList(item,src,target)
+        elif isinstance(item,str):
+            if item==src:
+                l[i]=target
     return l

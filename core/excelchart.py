@@ -2,24 +2,24 @@ import xlwt
 from tools import *
 
 info=readInfoByJson()
-schoolID2qq,schoolID2freq,schoolID2days,schoolID2rate=info[0:4]
+qq2schoolID,qq2freq,qq2days,qq2rate=info[0:4]
 
 HuayuChatting=xlwt.Workbook(encoding='utf-8',style_compression=0)
 sheet=HuayuChatting.add_sheet('华育校友营',cell_overwrite_ok=True)
 
-qqList=dictValue2List(schoolID2qq)
-freqList=dictValue2List(schoolID2freq)
-rateList=dictValue2List(schoolID2rate)
+schoolIDs=dictValue2List(qq2schoolID)
+freqList=dictValue2List(qq2freq)
+rateList=dictValue2List(qq2rate)
+qqList=[]
 
-schoolIDs=[]
-for key,value in schoolID2qq.items():
-    schoolIDs.append(key)
+for key,value in qq2schoolID.items():
+    qqList.append(key)
 
 col=('schoolID','qq','freq','rate')
 for i in range(4):
     sheet.write(0,i,col[i])
 
-length=len(schoolID2qq)
+length=len(qq2schoolID)
 for i in range(length):
     sheet.write(i+1,0,schoolIDs[i])
     sheet.write(i+1,1,qqList[i])
