@@ -151,6 +151,7 @@ def extract(filepath:str):
     logging.info('提取完毕,共%d条数据'%length)
 
 extract(filepath=inputFilename)
+extract(filepath='../in/华育校友营_4.txt')
 
 writeInfoByJson(qq2schoolID,qq2freq,qq2days,qq2rate,
                 chattingAllTime,chattingAllMonths,chattingAllWeeks,chattingStartTime,chattingEndTime,
