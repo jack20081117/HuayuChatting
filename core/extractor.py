@@ -88,14 +88,17 @@ def extract(filepath:str):
         schoolID_raw=re.search(r'(?<=[\s】])(?:1[0-9]|2[0-5]|0[89])[1-8]\d\d',line)#发言者的学号
         #计算学号时要考虑:五位学号前两位应为08<=xx<=25,第三位由于班级个数取1-8,后两位理论上来说从01-99均有可能
         if schoolID_raw is not None:schoolID:str=schoolID_raw.group()#先确定发言者是否有学号(考虑到有机器人参与)
-        elif qq=='10000':continue#判断为机器人(即自带系统消息)
+        elif qq=='10000' or qq=='1000000':continue#判断为机器人(即自带系统消息)
         else:schoolID=generateUnknown(qq)#生成unknown学号
 
         #如果发言者之前没有在字典中对应schoolID,qq,freq,day,rate等信息则进行设置
-        if not(qq in qq2schoolID):qq2schoolID[qq]=schoolID
-        if not(qq in qq2freq):qq2freq[qq]=0
-        if not(qq in qq2days):qq2days[qq]=[]
-        if not(date in qq2days[qq]):qq2days[qq].append(date)
+        if qq not in qq2schoolID:qq2schoolID[qq]=schoolID
+        #可能出现的一种情况是qq之前对应了unknown学号,但现在有新的(正确)学号需要被对应
+        #这种情况下要增加一个条件判断
+        if qq2schoolID[qq][0]=='u':qq2schoolID[qq]=schoolID
+        if qq not in qq2freq:qq2freq[qq]=0
+        if qq not in qq2days:qq2days[qq]=[]
+        if date not in qq2days[qq]:qq2days[qq].append(date)
 
         qq2freq[qq]+=1#发言者的发言总量+1
         qq2rate[qq]=qq2freq[qq]/len(qq2days[qq])
