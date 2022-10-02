@@ -3,7 +3,7 @@ from datetime import *
 logging.basicConfig(level=logging.INFO)
 from tools import *
 
-inputFilename='../in/华育校友营_3.txt'
+inputFilename=['../in/华育校友营_3.txt','../in/华育校友营_4.txt']
 #下面几个dict存储qq和schoolID,freq,days,rate等数据的映射关系
 qq2schoolID:dict[str,str]={}
 qq2freq:dict[str,int]={}
@@ -59,12 +59,15 @@ def searchQQ(line:str)->str:
     rqq=re.search(r'(?<=[)>])[^(<]+',rline).group()
     return rqq[::-1]
 
-def extractHead(filepath:str)->list[str]:
-    with open(filepath,'r',encoding='utf-8',errors='ignore') as reader:
-        txt:str=reader.read()
-    return re.findall(r'20[\d-]{8}\s+[\d:]{7,8}\s+[^\n]+(?:\d{5,11}|@\w+\.[comnet]{2,3})[)>]',txt)
+def extractHead(filepaths:list[str])->list[str]:
+    res=[]
+    for filepath in filepaths:
+        with open(filepath,'r',encoding='utf-8',errors='ignore') as reader:
+            txt:str=reader.read()
+        res.extend(re.findall(r'20[\d-]{8}\s+[\d:]{7,8}\s+[^\n]+(?:\d{5,11}|@\w+\.[comnet]{2,3})[)>]',txt))
+    return res
 
-def extract(filepath:str):
+def extract(filepaths:list):
     #提取数据核心模块
     logging.info('正在提取数据......')
     global chattingEachPart,chattingAllTime,chattingStartTime,chattingEndTime
@@ -78,7 +81,7 @@ def extract(filepath:str):
 
     length=0
 
-    for line in extractHead(filepath=filepath):
+    for line in extractHead(filepaths=filepaths):
         time=re.search(r'20[\d-]{8}\s[\d:]{7,8}',line).group()#发言时间,YYYY-mm-dd (H)H:MM:SS
         datetimeTime=datetime.strptime(time,'%Y-%m-%d %H:%M:%S')#发言时间转化为datetime格式
         month=re.search(r'20[\d-]{5}',time).group()#发言月份,YYYY-mm
@@ -150,8 +153,7 @@ def extract(filepath:str):
     chattingAllWeeks[str(datetime.fromtimestamp(tempWeek))]=chattingEachWeek
     logging.info('提取完毕,共%d条数据'%length)
 
-extract(filepath=inputFilename)
-extract(filepath='../in/华育校友营_4.txt')
+extract(filepaths=inputFilename)
 
 writeInfoByJson(qq2schoolID,qq2freq,qq2days,qq2rate,
                 chattingAllTime,chattingAllMonths,chattingAllWeeks,chattingStartTime,chattingEndTime,
