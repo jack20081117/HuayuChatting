@@ -3,7 +3,7 @@ from datetime import *
 logging.basicConfig(level=logging.INFO)
 from tools import *
 
-inputFilename=['../in/华育校友营_3.txt','../in/华育校友营_4.txt']
+inputFilename=['../in/华育校友营_3.txt','../in/华育校友营_4.txt','../in/华育校友营_5.txt']
 #下面几个dict存储qq和schoolID,freq,days,rate等数据的映射关系
 qq2schoolID:dict[str,str]={}
 qq2freq:dict[str,int]={}
