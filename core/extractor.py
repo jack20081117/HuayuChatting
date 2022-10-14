@@ -102,6 +102,7 @@ def extract(filepaths:list):
         #可能出现的一种情况是qq之前对应了unknown学号,但现在有新的(正确)学号需要被对应
         #这种情况下要增加一个条件判断
         if qq2schoolID[qq][0]=='u':qq2schoolID[qq]=schoolID
+        else:schoolID=qq2schoolID[qq]
         if qq not in qq2freq:qq2freq[qq]=0
         if qq not in qq2days:qq2days[qq]=[]
         if date not in qq2days[qq]:qq2days[qq].append(date)
@@ -138,6 +139,7 @@ def extract(filepaths:list):
             chattingEachMonth=[]
             chattingEachMonth.append(schoolID)
             tempMonth=month
+            logging.info('读取数据至:%s'%month)
 
         if tempWeek is None:tempWeek=weekStartTimestamp
         if datetimeTime.timestamp()<tempWeek+weekDelta:
