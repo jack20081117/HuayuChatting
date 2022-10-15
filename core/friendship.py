@@ -1,6 +1,6 @@
 from tools import *
 from matplotlib import pyplot
-import numpy,json
+import numpy,json,random
 
 info=readInfoByJson()
 chattingAllTime=info[4]
@@ -57,6 +57,7 @@ if __name__ == '__main__':
             print('以下是和该学号最亲近的五个人的学号:')
             pieList:list=[]
             pieFriendList:list=[]
+            gameList:list=[]
             for t in schoolIDFriendsSorted:
                 friendID=t[0]
                 friendnum=t[1]
@@ -65,10 +66,15 @@ if __name__ == '__main__':
                 pieFriendList.append(friendID)
                 if number<5:
                     print('学号:%s,邻接条数:%s条,在所有邻接记录中的占比:%.5f%%'%(friendID,friendnum,friendprob))
+                if number<15:
+                    gameList.append(friendID)
                 number+=1
             pieArray=numpy.array(pieList)
             pyplot.pie(pieArray,labels=pieFriendList,labeldistance=0.5,radius=1.2,rotatelabels=True)
             pyplot.title('The friends of %s'%schoolID)
+
+            random.shuffle(gameList)
+            print('随机抽取好友:%s'%','.join(gameList[:5]))
             if ifShow:
                 pyplot.show()
         except KeyError as e:
