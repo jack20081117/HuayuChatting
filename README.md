@@ -5,6 +5,7 @@
 ### 数据提取|extractor.py
 由于QQ聊天记录的高度格式化，可以较容易的用正则表达式对各类数据进行匹配。
 ```python
+#extractor.py
 import re
 
 def extractHead(filepath:str)->list[str]:
@@ -14,23 +15,99 @@ def extractHead(filepath:str)->list[str]:
     return re.findall(r'20[\d-]{8}\s+[\d:]{7,8}\s+[^\n]+(?:\d{5,11}|@\w+\.[comnet]{2,3})[)>]',txt)
 ```
 ### 数据分析
-#### 条形统计图|barchart.py
-通过python的matplotlib模块进行构图。
+#### weekchart.py&monthchart.py 周与月发言统计图
+在extractor.py中，有对发言所在月份进行提取的功能：
 ```python
-import numpy
-from matplotlib import pyplot
+#extractor.py
+month=re.search(r'20[\d-]{5}',time).group()#发言月份,YYYY-mm
+date=re.search(r'20[\d-]{8}',time).group()#发言日期,YYYY-mm-dd
+```
+同时，对于当前发言所在周，即每隔7*86400秒更新一次:
+```python
+#extractor.py
+weekDelta=604800#一周的秒数
+```
+最后，在extract函数中进行整理：
+```python
+#extractor.py
+        if tempMonth is None:tempMonth=month
+        if tempMonth>=month:
+            chattingEachMonth.append(schoolID)
+        else:
+            chattingAllMonths[tempMonth]=chattingEachMonth
+            chattingEachMonth=[]
+            chattingEachMonth.append(schoolID)
+            tempMonth=month
+            #logging.info('读取数据至:%s'%month)
 
-freqs:list[list]=[[],[],[],[]]
-schoolIDs_freq:list[list]=[[],[],[],[]]
+        if tempWeek is None:tempWeek=weekStartTimestamp
+        if datetimeTime.timestamp()<tempWeek+weekDelta:
+            chattingEachWeek.append(schoolID)
+        else:
+            chattingAllWeeks[str(datetime.fromtimestamp(tempWeek))]=chattingEachWeek
+            chattingEachWeek=[]
+            chattingEachWeek.append(schoolID)
+            tempWeek+=weekDelta
+```
+并将结果通过json dump到HuayuChatting/out目录下的chattingAllMonths.txt和chattingAllWeeks.txt。
+```python
+#tools.py
+import json
+def writeInfoByJson(chattingAllMonths,chattingAllWeeks):
+    with open('../out/chattingAllMonths.txt','w') as writer:
+        json.dump(chattingAllMonths,writer)
+    with open('../out/chattingAllWeeks.txt','w') as writer:
+        json.dump(chattingAllWeeks,writer)
+```
+在weekchart.py中，通过json再次将数据从txt文件中提取出：
+```python
+#tools.py
+def readInfoByJson()->tuple:
+    with open('../out/chattingAllMonths.txt','r') as reader:
+        chattingAllMonths=json.load(reader)
+    with open('../out/chattingAllWeeks.txt','r') as reader:
+        chattingAllWeeks=json.load(reader)
+    return chattingAllMonths,chattingAllWeeks
 
-def paint():
-    x=numpy.array(schoolIDs_freq[0])
-    y=numpy.array(freqs[0])
-    pyplot.bar(x,y)
-    pyplot.xlabel('Students who spoke over 10000 times')
-    pyplot.ylabel('The accurate number of messages')
-    pyplot.title('Frequency')
+#weekchart.py
+info=readInfoByJson()
+chattingAllWeeks=info[1]
+```
+接下来，对于提取出的数据做一些基本的处理，即根据每个月份统计每个学号出现的次数，也就是他的发言次数。
+```python
+#weekchart.py
+info=readInfoByJson()
+chattingAllWeeks=info[1]
+schoolID2weeks:dict[str,dict[str,int]]={}
+schoolIDs=set()
+
+for weekKey in chattingAllWeeks:
+    weekValue=chattingAllWeeks[weekKey]
+    for schoolID in weekValue:
+        if schoolID=='robot':continue
+        schoolIDs.add(schoolID)
+        if not schoolID in schoolID2weeks:schoolID2weeks[schoolID]={}
+
+for schoolID in schoolIDs:
+    for weekKey in chattingAllWeeks:
+        if not weekKey in schoolID2weeks[schoolID]:
+            schoolID2weeks[schoolID][weekKey]=0
+
+for weekKey in chattingAllWeeks:
+    weekValue=chattingAllWeeks[weekKey]
+    for schoolID in weekValue:
+        if schoolID=='robot':continue
+        schoolID2weeks[schoolID][weekKey]+=1
+```
+最后，根据schoolID“定点”输出周发言统计表。这里，使用matplotlib。
+```python
+def paint(schoolID):
+    data=schoolID2weeks[schoolID]
+    xs,ys=[],[]
+    for key,value in data.items():
+        xs.append(datetime.strptime(key[0:10],'%Y-%m-%d').date())
+        ys.append(value)
+    pyplot.plot_date(xs,ys,linestyle='-',marker='.')
+    pyplot.title(schoolID)
     pyplot.show()
 ```
-
-<p><img src="barchart1.png"></p>

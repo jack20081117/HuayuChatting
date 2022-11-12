@@ -74,7 +74,7 @@ if __name__ == '__main__':
             pyplot.title('The friends of %s'%schoolID)
 
             random.shuffle(gameList)
-            print('随机抽取好友:%s'%','.join(gameList[:5]))
+            print('随机抽取好友:%s'%','.join(gameList[:random.randint(3,7)]))
             if ifShow:
                 pyplot.show()
         except KeyError as e:
