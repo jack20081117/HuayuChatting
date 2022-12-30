@@ -88,8 +88,9 @@ def extract(filepaths:list):
         date=re.search(r'20[\d-]{8}',time).group()#发言日期,YYYY-mm-dd
 
         qq=searchQQ(line)#发言者的qq号
-        schoolID_raw=re.search(r'(?<=[\s】])(?:1[0-9]|2[0-6]|0[89])[1-8]\d\d',line)#发言者的学号
+        schoolID_raw=re.search(r'(?<=[\s】])(?:1[0-9]|2[0-6]|0[389])[1-8]\d\d',line)#发言者的学号
         #计算学号时要考虑:五位学号前两位应为08<=xx<=26,第三位由于班级个数取1-8,后两位理论上来说从01-99均有可能
+        #1230更新:由于有最早届(03)届校友入群,所以此处进行改动
         if schoolID_raw is not None:schoolID:str=schoolID_raw.group()#先确定发言者是否有学号(考虑到有机器人参与)
         elif qq=='10000' or qq=='1000000' or qq=='80000000':continue#判断为机器人(即自带系统消息)
         else:schoolID=generateUnknown(qq)#生成unknown学号
