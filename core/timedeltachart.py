@@ -36,5 +36,5 @@ def paint2():
     pyplot.show()
 
 if __name__ == '__main__':
-    #paint1()
+    paint1()
     paint2()
