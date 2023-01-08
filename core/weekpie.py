@@ -1,4 +1,4 @@
-import numpy
+import numpy,xlwt
 from tools import *
 from matplotlib import pyplot
 from datetime import *
@@ -14,12 +14,15 @@ def paint(weekKey,nextKey):
          if not schoolID in schoolID2freq:schoolID2freq[schoolID]=0
          schoolID2freq[schoolID]+=1
     sortedFreq=sortByValue(schoolID2freq)
+    freqsum:int=0
+    for i in range(len(sortedFreq)):
+        freqsum+=sortedFreq[i][1]
     schoolIDList=[]
     freqList=[]
     boy,girl=0,0
     for i in range(len(sortedFreq)):
         schoolIDList.append(sortedFreq[i][0])
-        freqList.append(sortedFreq[i][1])
+        freqList.append(sortedFreq[i][1]/freqsum)
         IDend=int(sortedFreq[i][0][-2])
         if 0<=IDend<=4:
             girl+=sortedFreq[i][1]
