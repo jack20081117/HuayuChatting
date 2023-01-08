@@ -1,32 +1,5 @@
 import json,logging
 
-def writeInfoByJson(qq2schoolID,qq2freq,qq2days,qq2rate,
-                    chattingAllTime,chattingAllMonths,chattingAllWeeks,chattingStartTime,chattingEndTime,
-                    timeDeltas,chattingAllDeltas):
-    #通过JSON向文件内写入数据
-    logging.info('正在写入数据......')
-    with open('../out/qq2schoolID.txt','w') as writer:
-        json.dump(qq2schoolID,writer)
-    with open('../out/qq2freq.txt','w') as writer:
-        json.dump(qq2freq,writer)
-    with open('../out/qq2days.txt','w') as writer:
-        json.dump(qq2days,writer)
-    with open('../out/qq2rate.txt','w') as writer:
-        json.dump(qq2rate,writer)
-    with open('../out/chattingAllTime.txt','w') as writer:
-        json.dump(chattingAllTime,writer)
-    with open('../out/chattingAllMonths.txt','w') as writer:
-        json.dump(chattingAllMonths,writer)
-    with open('../out/chattingAllWeeks.txt','w') as writer:
-        json.dump(chattingAllWeeks,writer)
-    with open('../out/chattingSTTime.txt','w') as writer:
-        json.dump((chattingStartTime,chattingEndTime),writer)
-    with open('../out/timeDeltas.txt','w') as writer:
-        json.dump(timeDeltas,writer)
-    with open('../out/chattingAllDeltas.txt','w') as writer:
-        json.dump(chattingAllDeltas,writer)
-    logging.info('写入数据完毕')
-
 def readInfoByJson()->tuple:
     #通过JSON从文件内读入数据
     logging.info('正在读入数据......')

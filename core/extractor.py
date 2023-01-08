@@ -17,7 +17,7 @@ timeDelta=120
 #默认如果两条消息相隔大于等于2分钟，则分属两个不同的对话part
 errorDelta=1e7
 #去除过于离谱的情况
-maxDelta=100
+maxDelta=120
 
 
 weekDelta=604800#一周的秒数
@@ -36,6 +36,9 @@ chattingAllMonths:dict[str,list[str]]={}
 
 chattingEachWeek:list[str]=[]
 chattingAllWeeks:dict[str,list[str]]={}
+
+chattingEachDay:list[str]=[]
+chattingAllDays:dict[str,list[str]]={}
 
 chattingAllDeltas:dict[int,int]={}
 
@@ -73,11 +76,13 @@ def extract(filepaths:list):
     global chattingEachPart,chattingAllTime,chattingStartTime,chattingEndTime
     global chattingEachMonth,chattingAllMonths
     global chattingEachWeek,chattingAllWeeks
+    global chattingEachDay,chattingAllDays
     global chattingAllDeltas
 
     tempTime=None#上一次的发言时间
     tempMonth=None#上一次发言所在月份
     tempWeek=None#上一次发言所在周(或者说是7x86400秒)
+    tempDate=None#上一次发言所在日
 
     length=0
 
@@ -151,19 +156,52 @@ def extract(filepaths:list):
             chattingEachWeek.append(schoolID)
             tempWeek+=weekDelta
 
+        if tempDate is None:tempDate=date
+        if tempDate>=date:
+            #同141行
+            chattingEachDay.append(schoolID)
+        else:
+            chattingAllDays[tempDate]=chattingEachDay
+            chattingEachDay=[]
+            chattingEachDay.append(schoolID)
+            tempDate=date
+
         length+=1
 
     chattingEndTime.append(str(tempTime))
     chattingAllTime.append(chattingEachPart)
     chattingAllMonths[tempMonth]=chattingEachMonth
     chattingAllWeeks[str(datetime.fromtimestamp(tempWeek))]=chattingEachWeek
+    chattingAllDays[tempDate]=chattingEachDay
     logging.info('提取完毕,共%d条数据'%length)
 
 extract(filepaths=inputFilename)
 
-writeInfoByJson(qq2schoolID,qq2freq,qq2days,qq2rate,
-                chattingAllTime,chattingAllMonths,chattingAllWeeks,chattingStartTime,chattingEndTime,
-                timeDeltas,chattingAllDeltas)
+#通过JSON向文件内写入数据
+logging.info('正在写入数据......')
+with open('../out/qq2schoolID.txt','w') as writer:
+    json.dump(qq2schoolID,writer)
+with open('../out/qq2freq.txt','w') as writer:
+    json.dump(qq2freq,writer)
+with open('../out/qq2days.txt','w') as writer:
+    json.dump(qq2days,writer)
+with open('../out/qq2rate.txt','w') as writer:
+    json.dump(qq2rate,writer)
+with open('../out/chattingAllTime.txt','w') as writer:
+    json.dump(chattingAllTime,writer)
+with open('../out/chattingAllMonths.txt','w') as writer:
+    json.dump(chattingAllMonths,writer)
+with open('../out/chattingAllWeeks.txt','w') as writer:
+    json.dump(chattingAllWeeks,writer)
+with open('../out/chattingAllDays.txt','w') as writer:
+    json.dump(chattingAllDays,writer)
+with open('../out/chattingSTTime.txt','w') as writer:
+    json.dump((chattingStartTime,chattingEndTime),writer)
+with open('../out/timeDeltas.txt','w') as writer:
+    json.dump(timeDeltas,writer)
+with open('../out/chattingAllDeltas.txt','w') as writer:
+    json.dump(chattingAllDeltas,writer)
+logging.info('写入数据完毕')
 
 if __name__ == '__main__':
     pass
