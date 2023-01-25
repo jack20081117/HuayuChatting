@@ -1,9 +1,10 @@
 import re,logging
+from tqdm import tqdm
 from datetime import *
 logging.basicConfig(level=logging.INFO)
 from tools import *
 
-inputFilename=['../in/华育校友营_3.txt','../in/华育校友营_4.txt','../in/华育校友营_5.txt']
+inputFilename=['../in/华育校友营_3.txt','../in/华育校友营_4_jzb.txt','../in/华育校友营_4_syx.txt','../in/华育校友营_5.txt']
 #下面几个dict存储qq和schoolID,freq,days,rate等数据的映射关系
 qq2schoolID:dict[str,str]={}
 qq2freq:dict[str,int]={}
@@ -63,12 +64,14 @@ def searchQQ(line:str)->str:
     return rqq[::-1]
 
 def extractHead(filepaths:list[str])->list[str]:
-    res=[]
+    resList=[]
     for filepath in filepaths:
         with open(filepath,'r',encoding='utf-8',errors='ignore') as reader:
             txt:str=reader.read()
-        res.extend(re.findall(r'20[\d-]{8}\s+[\d:]{7,8}\s+[^\n]+(?:\d{5,11}|@\w+\.[comnet]{2,3})[)>]',txt))
-    return res
+        resList.extend(re.findall(r'20[\d-]{8}\s+[\d:]{7,8}\s+[^\n]+(?:\d{5,11}|@\w+\.[comnet]{2,3})[)>]',txt))
+    #用set可以去重，但set是无序的，需要排序
+    resSet=set(resList)
+    return sorted(resSet)
 
 def extract(filepaths:list):
     #提取数据核心模块
@@ -85,8 +88,11 @@ def extract(filepaths:list):
     tempDate=None#上一次发言所在日
 
     length=0
+    data=extractHead(filepaths=filepaths)
+    progress=tqdm(range(len(data)))
 
-    for line in extractHead(filepaths=filepaths):
+    for i in progress:
+        line=data[i]
         time=re.search(r'20[\d-]{8}\s[\d:]{7,8}',line).group()#发言时间,YYYY-mm-dd (H)H:MM:SS
         datetimeTime=datetime.strptime(time,'%Y-%m-%d %H:%M:%S')#发言时间转化为datetime格式
         month=re.search(r'20[\d-]{5}',time).group()#发言月份,YYYY-mm
@@ -145,7 +151,6 @@ def extract(filepaths:list):
             chattingEachMonth=[]
             chattingEachMonth.append(schoolID)
             tempMonth=month
-            logging.info('读取数据至:%s'%month)
 
         if tempWeek is None:tempWeek=weekStartTimestamp
         if datetimeTime.timestamp()<tempWeek+weekDelta:
