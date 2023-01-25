@@ -78,6 +78,11 @@ def decayedPaint2(weekKey,nextKey):
     pyplot.title('%s~%s'%(weekKey[:10],nextKey[:10]))
     pyplot.show()
 
+def getNextWeekKey(weekKey):
+    week=datetime.strptime(weekKey,'%Y-%m-%d %H:%M:%S')
+    nextweek=datetime.fromtimestamp(week.timestamp()+7*86400)
+    return str(nextweek)
+
 if __name__ == '__main__':
     while True:
         try:
@@ -88,9 +93,9 @@ if __name__ == '__main__':
             dayKey+=' 00:00:00'
             lastKey=None
             for weekKey in chattingAllWeeks:
-                if lastKey is None:
+                if lastKey is None or lastKey==weekKey:
                     lastKey=weekKey
-                    weekKey='2020-02-23 00:00:00'
+                    weekKey=getNextWeekKey(lastKey)
                 if lastKey<=dayKey<=weekKey:
                     decayedPaint2(lastKey,weekKey)
                     break
