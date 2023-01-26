@@ -54,7 +54,7 @@ def sumOfValue(d:dict[str,int])->int:
         sum+=value
     return sum
 
-def transferList(l:list,src,target)->list[str]:
+def transferList(l:list,src,target)->list:
     for i in range(len(l)):
         item=l[i]
         if isinstance(item,list):
@@ -63,3 +63,14 @@ def transferList(l:list,src,target)->list[str]:
             if item==src:
                 l[i]=target
     return l
+
+def transferDict(d:dict,src,target)->dict:
+    for key,value in d.items():
+        if isinstance(value,str):
+            if value==src:
+                d[key]=target
+        if isinstance(value,dict):
+            d[key]=transferDict(value,src,target)
+        if isinstance(value,list):
+            d[key]=transferList(value,src,target)
+    return d
