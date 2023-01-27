@@ -1,7 +1,7 @@
 in/*
-jzb
-nth
 .idea
+core/static/img/*
+out/*.xls;xlsx;csv
 
 *.py[cod]
 

@@ -1,0 +1,48 @@
+<!--
+This is Jack's web app.
+created by Jack.
+Using python,html,css,js.
+Don't copy it.
+                    2021/6/6
+-->
+
+<!--所有html的父模板-->
+<html>
+<head>
+<title>{% block title %} {% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="/static/css/base.css">
+</head>
+<body>
+<!-- 导航栏 -->
+<ul>
+    <li><a href="http://localhost:5000/home" style="font-size:20px;" id="Home">主页-HuayuChatting</a></li>
+</ul>
+
+<!-- 内容 -->
+<div class="row">
+    <div class="leftcolumn">
+        {% block content %}<h2>Nothing here...</h2>{% endblock %}
+    </div>
+    <div class="rightcolumn">
+        {% block column %}
+        <h3>About me</h3>
+        <form>
+            <fieldset>
+                <p>Jack Zhang,a student of Huayu Middle School.</p>
+                <p>Hobbies:playing the piano,singing,programming</p>
+            </fieldset>
+            <fieldset>
+                <legend>My personal signature</legend>
+                <p>生命的意义是什么?生命没有任何意义.<br />但是,我们要给自己的生命创造出意义.</p>
+            </fieldset>
+            </form>
+        {% endblock %}
+    </div>
+</div>
+
+<!-- 页尾 -->
+<div class="footer">
+    <p>Jack's web app.©Copyright 2021-2025.<br>All rights deserved.</p>
+</div>
+</body>
+</html>
