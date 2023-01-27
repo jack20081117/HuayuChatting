@@ -1,0 +1,18 @@
+{% extends '__base__.html' %}
+{% block title %}
+{% if time %}
+weekpie:{{ time }}
+{% else %}
+weekpie
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if time %}
+<h3>The weekpie on {{ time }}</h3>
+<img src="/static/img/weekpie.png">
+{% else %}
+<h3>Weekpie</h3>
+<p>请在本页面网址后加上想要查看的日期。</p>
+{% endif %}
+{% endblock %}

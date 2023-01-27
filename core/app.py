@@ -16,6 +16,11 @@ def weekchart_id(schoolID):
     os.system('python weekchart_app.py --id %s'%schoolID)
     return render_template('weekchart.html',schoolID=schoolID)
 
+@app.route('/week/pie/<time>',methods=['GET','POST'])
+def weekpie_time(time):
+    os.system('python weekpie_app.py --time %s'%time)
+    return render_template('weekpie.html',time=time)
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'),404
