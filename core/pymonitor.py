@@ -37,8 +37,8 @@ def kill_process():
 def start_process():
     global process,command
     log('Start process %s...'%' '.join(command))
-    #process=subprocess.Popen(command,stdin=sys.stdin,stdout=sys.stdout,stderr=sys.stderr)
-    process=os.system(' '.join(command))
+    process=subprocess.Popen(command,stdin=sys.stdin,stdout=sys.stdout,stderr=sys.stderr)
+    #process=os.system(' '.join(command))
 
 def restart_process():
     kill_process()
