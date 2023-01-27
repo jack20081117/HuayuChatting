@@ -1,8 +1,8 @@
 in/*
 .idea
 core/static/img/*
-out/*.xls;xlsx;csv
 
+*.xls;xlsx;csv
 *.py[cod]
 
 !.gitkeep
