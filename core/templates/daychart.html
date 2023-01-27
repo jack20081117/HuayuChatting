@@ -1,0 +1,18 @@
+{% extends '__base__.html' %}
+{% block title %}
+{% if schoolID %}
+daychart:{{ schoolID }}
+{% else %}
+daychart
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if schoolID %}
+<h3>The daychart of {{ schoolID }}</h3>
+<img src="/static/img/daychart.png">
+{% else %}
+<h3>Daychart</h3>
+<p>请在本页面网址后加上想要查看的人的学号。</p>
+{% endif %}
+{% endblock %}

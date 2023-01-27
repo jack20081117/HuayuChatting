@@ -7,6 +7,15 @@ app=Flask(__name__)
 def home():
     return render_template('home.html')
 
+@app.route('/month/chart/',methods=['GET','POST'])
+def monthchart():
+    return render_template('monthchart.html')
+
+@app.route('/month/chart/<schoolID>',methods=['GET','POST'])
+def monthchart_id(schoolID):
+    os.system('python monthchart_app.py --id %s'%schoolID)
+    return render_template('monthchart.html',schoolID=schoolID)
+
 @app.route('/week/chart/',methods=['GET','POST'])
 def weekchart():
     return render_template('weekchart.html')
@@ -15,6 +24,19 @@ def weekchart():
 def weekchart_id(schoolID):
     os.system('python weekchart_app.py --id %s'%schoolID)
     return render_template('weekchart.html',schoolID=schoolID)
+
+@app.route('/day/chart/',methods=['GET','POST'])
+def daychart():
+    return render_template('daychart.html')
+
+@app.route('/day/chart/<schoolID>',methods=['GET','POST'])
+def daychart_id(schoolID):
+    os.system('python daychart_app.py --id %s'%schoolID)
+    return render_template('daychart.html',schoolID=schoolID)
+
+@app.route('/week/pie/',methods=['GET','POST'])
+def weekpie():
+    return render_template('weekpie.html')
 
 @app.route('/week/pie/<time>',methods=['GET','POST'])
 def weekpie_time(time):
