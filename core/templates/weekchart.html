@@ -1,7 +1,18 @@
 {% extends '__base__.html' %}
-{% block title %}weekchart:{{ schoolID }}{% endblock %}
+{% block title %}
+{% if schoolID %}
+weekchart:{{ schoolID }}
+{% else %}
+weekchart
+{% endif %}
+{% endblock %}
 
 {% block content %}
+{% if schoolID %}
 <h3>The weekchart of {{ schoolID }}</h3>
 <img src="/static/img/weekchart.png">
+{% else %}
+<h3>Weekchart</h3>
+
+{% endif %}
 {% endblock %}

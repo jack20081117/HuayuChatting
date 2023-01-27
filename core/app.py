@@ -7,8 +7,12 @@ app=Flask(__name__)
 def home():
     return render_template('home.html')
 
+@app.route('/week/chart/',methods=['GET','POST'])
+def weekchart():
+    return render_template('weekchart.html')
+
 @app.route('/week/chart/<schoolID>',methods=['GET','POST'])
-def weekchart(schoolID):
+def weekchart_id(schoolID):
     os.system('python weekchart_app.py --id %s'%schoolID)
     return render_template('weekchart.html',schoolID=schoolID)
 
