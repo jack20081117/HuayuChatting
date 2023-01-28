@@ -1,7 +1,7 @@
-import numpy
-from tools import *
 from matplotlib import pyplot
 from datetime import *
+from tools import *
+from argparse import ArgumentParser
 
 info=readInfoByJson()
 chattingAllWeeks=info[6]
@@ -40,7 +40,7 @@ for weekKey in chattingAllWeeks:
         decayedSchoolID2weeks[schoolID][weekKey]=decayedSchoolID2weeks[schoolID][lastKey]*decay+schoolID2weeks[schoolID][weekKey]
     lastKey=weekKey
 
-def decayedPaint1(schoolID):
+def paint(schoolID):
     data=schoolID2weeks[schoolID]
     decayedData=decayedSchoolID2weeks[schoolID]
     xs,ys=[],[]
@@ -55,52 +55,14 @@ def decayedPaint1(schoolID):
     pyplot.figure(figsize=(10,5))
     pyplot.plot_date(xs,ys,linestyle='-',marker='.')
     pyplot.title(schoolID)
-    pyplot.show()
-
-def decayedPaint2(weekKey,nextKey):
-    decayedWeeks2schoolID:dict[str,dict[str,float]]={}
-    xs,ys=[],[]
-    for schoolID in schoolIDs:
-        data=schoolID2weeks[schoolID]
-        decayedData=decayedSchoolID2weeks[schoolID]
-        _key=None
-        for key in data:
-            if key not in decayedWeeks2schoolID:decayedWeeks2schoolID[key]={}
-            decayedWeeks2schoolID[key][schoolID]=decayedData[key]*0.9+data[key]*0.1
-            if _key is not None:
-                decayedWeeks2schoolID[key][schoolID]-=0.0005*data[_key]
-            _key=key
-    sortedValue=sortByValue(decayedWeeks2schoolID[weekKey])
-    sortedValue=sortedValue[:8]
-    for t in sortedValue:
-        xs.append(t[0])
-        ys.append(t[1])
-    pyplot.bar(xs,ys)
-    pyplot.title('%s~%s'%(weekKey[:10],nextKey[:10]))
-    pyplot.show()
-
-def getNextWeekKey(weekKey):
-    week=datetime.strptime(weekKey,'%Y-%m-%d %H:%M:%S')
-    nextweek=datetime.fromtimestamp(week.timestamp()+7*86400)
-    return str(nextweek)
+    pyplot.savefig("./static/img/decaychart.png")
 
 if __name__ == '__main__':
-    while True:
-        try:
-            schoolID=input('请输入您想了解的学号:')
-            decayedPaint1(schoolID)
-
-            dayKey=input('Choose the day you want:')
-            dayKey+=' 00:00:00'
-            lastKey=None
-            for weekKey in chattingAllWeeks:
-                if lastKey is None or lastKey==weekKey:
-                    lastKey=weekKey
-                    weekKey=getNextWeekKey(lastKey)
-                if lastKey<=dayKey<=weekKey:
-                    decayedPaint2(lastKey,weekKey)
-                    break
-                lastKey=weekKey
-        except KeyError as e:
-            print('输入错误,请重新输入!')
-            print(e)
+    parser=ArgumentParser()
+    parser.add_argument(
+        "--id",
+        help="Insert the SchoolID you want to know",
+        dest="id",default=None)
+    args=parser.parse_args()
+    schoolID=args.id
+    paint(schoolID)

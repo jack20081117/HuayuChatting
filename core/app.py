@@ -37,6 +37,21 @@ def weekchart_id(schoolID):
     os.system('python weekchart_app.py --id %s'%schoolID)
     return render_template('weekchart.html',schoolID=schoolID)
 
+@app.route('/decay/chart/',methods=['GET'])
+def decaychart():
+    return render_template('decaychart.html')
+
+@app.route('/decay/chart/',methods=['POST'])
+def decaychart_form():
+    schoolID=request.form['schoolID']
+    os.system('python decaychart_app.py --id %s'%schoolID)
+    return render_template('decaychart.html',schoolID=schoolID)
+
+@app.route('/decay/chart/<schoolID>',methods=['GET','POST'])
+def decaychart_id(schoolID):
+    os.system('python decaychart_app.py --id %s'%schoolID)
+    return render_template('decaychart.html',schoolID=schoolID)
+
 @app.route('/day/chart/',methods=['GET'])
 def daychart():
     return render_template('daychart.html')

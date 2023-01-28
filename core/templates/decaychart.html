@@ -1,0 +1,25 @@
+{% extends '__base__.html' %}
+{% block title %}
+{% if schoolID %}
+decaychart:{{ schoolID }}
+{% else %}
+decay
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if schoolID %}
+<h3>The decaychart of {{ schoolID }}</h3>
+<img src="/static/img/decaychart.png">
+{% else %}
+<h3>Decaychart</h3>
+<form action="/decay/chart/" method="post">
+    <fieldset>
+        <legend>请输入想查看的人的学号:</legend>
+        <p><input name="schoolID" placeholder="schoolID"></p>
+        <p><button type="submit" class="button1">Submit</button></p>
+    </fieldset>
+</form>
+<p>您也可以通过本页面网址后加上想要查看的人的学号来查看他的影响力统计表。</p>
+{% endif %}
+{% endblock %}
