@@ -13,6 +13,13 @@ weekpie
 <img src="/static/img/weekpie.png">
 {% else %}
 <h3>Weekpie</h3>
-<p>请在本页面网址后加上想要查看的日期。</p>
+<form action="/week/pie/" method="post">
+    <fieldset>
+        <legend>请输入想查看的日期:</legend>
+        <p><input name="time" placeholder="YYYY-mm-dd"></p>
+        <p><button type="submit" class="button1">Submit</button></p>
+    </fieldset>
+</form>
+<p>您也可以通过在本页面网址后加上想要查看的日期来查看所在周的发言饼图。</p>
 {% endif %}
 {% endblock %}

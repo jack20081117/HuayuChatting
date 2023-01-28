@@ -52,9 +52,15 @@ def daychart_id(schoolID):
     os.system('python daychart_app.py --id %s'%schoolID)
     return render_template('daychart.html',schoolID=schoolID)
 
-@app.route('/week/pie/',methods=['GET','POST'])
+@app.route('/week/pie/',methods=['GET'])
 def weekpie():
     return render_template('weekpie.html')
+
+@app.route('/week/pie/',methods=['POST'])
+def weekpie_form():
+    time=request.form['time']
+    os.system('python weekpie_app.py --time %s'%time)
+    return render_template('weekpie.html',time=time)
 
 @app.route('/week/pie/<time>',methods=['GET','POST'])
 def weekpie_time(time):
