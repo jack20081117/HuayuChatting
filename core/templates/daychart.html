@@ -13,6 +13,13 @@ daychart
 <img src="/static/img/daychart.png">
 {% else %}
 <h3>Daychart</h3>
-<p>请在本页面网址后加上想要查看的人的学号。</p>
+<form action="/day/chart/" method="post">
+    <fieldset>
+        <legend>请输入想查看的人的学号:</legend>
+        <p><input name="schoolID" placeholder="schoolID"></p>
+        <p><button type="submit" class="button1">Submit</button></p>
+    </fieldset>
+</form>
+<p>您也可以通过本页面网址后加上想要查看的人的学号来查看他的日发言统计表。</p>
 {% endif %}
 {% endblock %}

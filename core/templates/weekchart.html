@@ -13,6 +13,13 @@ weekchart
 <img src="/static/img/weekchart.png">
 {% else %}
 <h3>Weekchart</h3>
-<p>请在本页面网址后加上想要查看的人的学号。</p>
+<form action="/week/chart/" method="post">
+    <fieldset>
+        <legend>请输入想查看的人的学号:</legend>
+        <p><input name="schoolID" placeholder="schoolID"></p>
+        <p><button type="submit" class="button1">Submit</button></p>
+    </fieldset>
+</form>
+<p>您也可以通过本页面网址后加上想要查看的人的学号来查看他的周发言统计表。</p>
 {% endif %}
 {% endblock %}
