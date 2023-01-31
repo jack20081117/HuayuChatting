@@ -1,6 +1,7 @@
 import numpy
 from datetime import datetime
 from matplotlib import pyplot
+from argparse import ArgumentParser
 from tools import *
 
 info=readInfoByJson()
@@ -56,8 +57,20 @@ _ys1=[i for i in range(start,end)]
 _ys2=[i for i in range(start+4,end+4)]
 
 if __name__ == '__main__':
+    pyplot.figure(figsize=(10,5))
     pyplot.plot_date(xs,ys,linestyle='-',marker='.')
     pyplot.plot(_xs,_ys1,linestyle='-')
     pyplot.plot(_xs,_ys2,linestyle='-')
     pyplot.title('AgeChart')
-    pyplot.show()
+
+    parser=ArgumentParser()
+    parser.add_argument(
+        "--save",
+        help="Insert True if you want to save the figure else False",
+        dest="save",default=None)
+    args=parser.parse_args()
+    save=args.save
+    if save=='True':
+        pyplot.savefig("./static/img/agechart.png")
+    else:
+        pyplot.show()

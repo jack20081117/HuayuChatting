@@ -82,6 +82,11 @@ def weekpie_time(time):
     os.system('python weekpie_app.py --time %s'%time)
     return render_template('weekpie.html',time=time)
 
+@app.route('/age/chart/',methods=['GET','POST'])
+def agechart():
+    os.system('python agechart.py --save True')
+    return render_template('agechart.html')
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'),404
