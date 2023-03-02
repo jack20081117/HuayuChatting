@@ -1,4 +1,4 @@
-import numpy
+import numpy,xlwt
 from tools import *
 from matplotlib import pyplot
 from datetime import *
@@ -14,12 +14,15 @@ def paint(weekKey,nextKey):
          if not schoolID in schoolID2freq:schoolID2freq[schoolID]=0
          schoolID2freq[schoolID]+=1
     sortedFreq=sortByValue(schoolID2freq)
+    freqsum:int=0
+    for i in range(len(sortedFreq)):
+        freqsum+=sortedFreq[i][1]
     schoolIDList=[]
     freqList=[]
     boy,girl=0,0
     for i in range(len(sortedFreq)):
         schoolIDList.append(sortedFreq[i][0])
-        freqList.append(sortedFreq[i][1])
+        freqList.append(sortedFreq[i][1]/freqsum)
         IDend=int(sortedFreq[i][0][-2])
         if 0<=IDend<=4:
             girl+=sortedFreq[i][1]
@@ -37,6 +40,11 @@ def paint(weekKey,nextKey):
     pyplot.title('%s~%s'%(weekKey[0:10],nextKey[0:10]))
     pyplot.show()
 
+def getNextWeekKey(weekKey):
+    week=datetime.strptime(weekKey,'%Y-%m-%d %H:%M:%S')
+    nextweek=datetime.fromtimestamp(week.timestamp()+7*86400)
+    return str(nextweek)
+
 if __name__ == '__main__':
     while True:
         try:
@@ -44,9 +52,9 @@ if __name__ == '__main__':
             dayKey+=' 00:00:00'
             lastKey=None
             for weekKey in chattingAllWeeks:
-                if lastKey is None:
+                if lastKey is None or lastKey==weekKey:
                     lastKey=weekKey
-                    weekKey='2020-02-23 00:00:00'
+                    weekKey=getNextWeekKey(lastKey)
                 if lastKey<=dayKey<=weekKey:
                     paint(lastKey,weekKey)
                     break

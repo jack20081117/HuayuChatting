@@ -1,9 +1,10 @@
 import re,logging
+from tqdm import tqdm
 from datetime import *
 logging.basicConfig(level=logging.INFO)
 from tools import *
 
-inputFilename=['../in/华育校友营_3.txt','../in/华育校友营_4.txt','../in/华育校友营_5.txt']
+inputFilename=['../in/华育校友营_3.txt','../in/华育校友营_4_jzb.txt','../in/华育校友营_4_syx.txt','../in/华育校友营_5.txt']
 #下面几个dict存储qq和schoolID,freq,days,rate等数据的映射关系
 qq2schoolID:dict[str,str]={}
 qq2freq:dict[str,int]={}
@@ -17,7 +18,7 @@ timeDelta=120
 #默认如果两条消息相隔大于等于2分钟，则分属两个不同的对话part
 errorDelta=1e7
 #去除过于离谱的情况
-maxDelta=100
+maxDelta=120
 
 
 weekDelta=604800#一周的秒数
@@ -36,6 +37,9 @@ chattingAllMonths:dict[str,list[str]]={}
 
 chattingEachWeek:list[str]=[]
 chattingAllWeeks:dict[str,list[str]]={}
+
+chattingEachDay:list[str]=[]
+chattingAllDays:dict[str,list[str]]={}
 
 chattingAllDeltas:dict[int,int]={}
 
@@ -60,12 +64,14 @@ def searchQQ(line:str)->str:
     return rqq[::-1]
 
 def extractHead(filepaths:list[str])->list[str]:
-    res=[]
+    resList=[]
     for filepath in filepaths:
         with open(filepath,'r',encoding='utf-8',errors='ignore') as reader:
             txt:str=reader.read()
-        res.extend(re.findall(r'20[\d-]{8}\s+[\d:]{7,8}\s+[^\n]+(?:\d{5,11}|@\w+\.[comnet]{2,3})[)>]',txt))
-    return res
+        resList.extend(re.findall(r'20[\d-]{8}\s+[\d:]{7,8}\s+[^\n]+(?:\d{5,11}|@\w+\.[comnet]{2,3})[)>]',txt))
+    #用set可以去重，但set是无序的，需要排序
+    resSet=set(resList)
+    return sorted(resSet)
 
 def extract(filepaths:list):
     #提取数据核心模块
@@ -73,23 +79,29 @@ def extract(filepaths:list):
     global chattingEachPart,chattingAllTime,chattingStartTime,chattingEndTime
     global chattingEachMonth,chattingAllMonths
     global chattingEachWeek,chattingAllWeeks
+    global chattingEachDay,chattingAllDays
     global chattingAllDeltas
 
     tempTime=None#上一次的发言时间
     tempMonth=None#上一次发言所在月份
     tempWeek=None#上一次发言所在周(或者说是7x86400秒)
+    tempDate=None#上一次发言所在日
 
     length=0
+    data=extractHead(filepaths=filepaths)
+    progress=tqdm(range(len(data)))
 
-    for line in extractHead(filepaths=filepaths):
+    for i in progress:
+        line=data[i]
         time=re.search(r'20[\d-]{8}\s[\d:]{7,8}',line).group()#发言时间,YYYY-mm-dd (H)H:MM:SS
         datetimeTime=datetime.strptime(time,'%Y-%m-%d %H:%M:%S')#发言时间转化为datetime格式
         month=re.search(r'20[\d-]{5}',time).group()#发言月份,YYYY-mm
         date=re.search(r'20[\d-]{8}',time).group()#发言日期,YYYY-mm-dd
 
         qq=searchQQ(line)#发言者的qq号
-        schoolID_raw=re.search(r'(?<=[\s】])(?:1[0-9]|2[0-6]|0[89])[1-8]\d\d',line)#发言者的学号
+        schoolID_raw=re.search(r'(?<=[\s】])(?:1[0-9]|2[0-6]|0[389])[1-8]\d\d',line)#发言者的学号
         #计算学号时要考虑:五位学号前两位应为08<=xx<=26,第三位由于班级个数取1-8,后两位理论上来说从01-99均有可能
+        #1230更新:由于有最早届(03)届校友入群,所以此处进行改动
         if schoolID_raw is not None:schoolID:str=schoolID_raw.group()#先确定发言者是否有学号(考虑到有机器人参与)
         elif qq=='10000' or qq=='1000000' or qq=='80000000':continue#判断为机器人(即自带系统消息)
         else:schoolID=generateUnknown(qq)#生成unknown学号
@@ -139,7 +151,6 @@ def extract(filepaths:list):
             chattingEachMonth=[]
             chattingEachMonth.append(schoolID)
             tempMonth=month
-            logging.info('读取数据至:%s'%month)
 
         if tempWeek is None:tempWeek=weekStartTimestamp
         if datetimeTime.timestamp()<tempWeek+weekDelta:
@@ -150,19 +161,52 @@ def extract(filepaths:list):
             chattingEachWeek.append(schoolID)
             tempWeek+=weekDelta
 
+        if tempDate is None:tempDate=date
+        if tempDate>=date:
+            #同141行
+            chattingEachDay.append(schoolID)
+        else:
+            chattingAllDays[tempDate]=chattingEachDay
+            chattingEachDay=[]
+            chattingEachDay.append(schoolID)
+            tempDate=date
+
         length+=1
 
     chattingEndTime.append(str(tempTime))
     chattingAllTime.append(chattingEachPart)
     chattingAllMonths[tempMonth]=chattingEachMonth
     chattingAllWeeks[str(datetime.fromtimestamp(tempWeek))]=chattingEachWeek
+    chattingAllDays[tempDate]=chattingEachDay
     logging.info('提取完毕,共%d条数据'%length)
 
 extract(filepaths=inputFilename)
 
-writeInfoByJson(qq2schoolID,qq2freq,qq2days,qq2rate,
-                chattingAllTime,chattingAllMonths,chattingAllWeeks,chattingStartTime,chattingEndTime,
-                timeDeltas,chattingAllDeltas)
+#通过JSON向文件内写入数据
+logging.info('正在写入数据......')
+with open('../out/qq2schoolID.txt','w') as writer:
+    json.dump(qq2schoolID,writer)
+with open('../out/qq2freq.txt','w') as writer:
+    json.dump(qq2freq,writer)
+with open('../out/qq2days.txt','w') as writer:
+    json.dump(qq2days,writer)
+with open('../out/qq2rate.txt','w') as writer:
+    json.dump(qq2rate,writer)
+with open('../out/chattingAllTime.txt','w') as writer:
+    json.dump(chattingAllTime,writer)
+with open('../out/chattingAllMonths.txt','w') as writer:
+    json.dump(chattingAllMonths,writer)
+with open('../out/chattingAllWeeks.txt','w') as writer:
+    json.dump(chattingAllWeeks,writer)
+with open('../out/chattingAllDays.txt','w') as writer:
+    json.dump(chattingAllDays,writer)
+with open('../out/chattingSTTime.txt','w') as writer:
+    json.dump((chattingStartTime,chattingEndTime),writer)
+with open('../out/timeDeltas.txt','w') as writer:
+    json.dump(timeDeltas,writer)
+with open('../out/chattingAllDeltas.txt','w') as writer:
+    json.dump(chattingAllDeltas,writer)
+logging.info('写入数据完毕')
 
 if __name__ == '__main__':
     pass

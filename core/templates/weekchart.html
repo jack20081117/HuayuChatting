@@ -1,0 +1,25 @@
+{% extends '__base__.html' %}
+{% block title %}
+{% if schoolID %}
+weekchart:{{ schoolID }}
+{% else %}
+weekchart
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if schoolID %}
+<h3>The weekchart of {{ schoolID }}</h3>
+<img src="/static/img/weekchart.png">
+{% else %}
+<h3>Weekchart</h3>
+<form action="/week/chart/" method="post">
+    <fieldset>
+        <legend>请输入想查看的人的学号:</legend>
+        <p><input name="schoolID" placeholder="schoolID"></p>
+        <p><button type="submit" class="button1">Submit</button></p>
+    </fieldset>
+</form>
+<p>您也可以通过本页面网址后加上想要查看的人的学号来查看他的周发言统计表。</p>
+{% endif %}
+{% endblock %}

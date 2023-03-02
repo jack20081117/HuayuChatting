@@ -1,8 +1,8 @@
 in/*
-jzb
-nth
 .idea
+core/static/img/*
 
+*.xls;xlsx;csv
 *.py[cod]
 
 !.gitkeep

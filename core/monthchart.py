@@ -32,6 +32,7 @@ def paint(schoolID):
     for key,value in data.items():
         xs.append(datetime.strptime(key,'%Y-%m').date())
         ys.append(value)
+    pyplot.figure(figsize=(10,5))
     pyplot.plot_date(xs,ys,linestyle='-',marker='.')
     pyplot.title(schoolID)
     pyplot.show()

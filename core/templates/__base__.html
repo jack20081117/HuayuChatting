@@ -1,0 +1,52 @@
+<!--
+This is Jack's web app.
+created by Jack.
+Using python,html,css,js.
+Don't copy it.
+                    2021/6/6
+-->
+
+<!--所有html的父模板-->
+<html>
+<head>
+<title>{% block title %} {% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="/static/css/base.css">
+</head>
+<body>
+<!-- 导航栏 -->
+<ul>
+    <li><a href="http://localhost:5000/home" style="font-size:20px;" id="Home">主页-HuayuChatting</a></li>
+    <li class="dropdown">
+        <a href="#" class="dropbtn" id="Maths">Charts</a>
+        <div class="dropdown-content">
+            <a href="http://localhost:5000/day/chart/">日发言折线图</a>
+            <a href="http://localhost:5000/week/chart/">周发言折线图</a>
+            <a href="http://localhost:5000/month/chart">月发言折线图</a>
+            <a href="http://localhost:5000/decay/chart">影响力折线图</a>
+            <a href="http://localhost:5000/age/chart">平均年龄折线图</a>
+        </div>
+    </li>
+    <li><a href="http://localhost:5000/week/pie">Week pie</a></li>
+</ul>
+
+<!-- 内容 -->
+<div class="row">
+    <div class="leftcolumn">
+        {% block content %}<h2>Nothing here...</h2>{% endblock %}
+    </div>
+    <div class="rightcolumn">
+        {% block column %}
+        <h3>About HuayuChatting</h3>
+        <p>项目源代码网址:</p>
+        <p>Gitee:<a href="https://gitee.com/jack20081117/huayu-chatting.git">Gitee</a></p>
+        <p>Github:<a href="https://github.com/jack20081117/HuayuChatting.git">Github</a></p>
+        {% endblock %}
+    </div>
+</div>
+
+<!-- 页尾 -->
+<div class="footer">
+    <p>Jack's web app.©Copyright 2021-2025.<br>All rights deserved.</p>
+</div>
+</body>
+</html>
