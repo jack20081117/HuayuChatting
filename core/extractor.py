@@ -1,10 +1,10 @@
-import re,logging
+import re,logging,os
 from tqdm import tqdm
 from datetime import *
 logging.basicConfig(level=logging.INFO)
 from tools import *
 
-inputFilename=['../in/华育校友营_3.txt','../in/华育校友营_4_jzb.txt','../in/华育校友营_4_syx.txt','../in/华育校友营_5.txt']
+inputFilename=['../in/'+x for x in os.listdir('../in') if os.path.splitext(x)[1]=='.txt']
 #下面几个dict存储qq和schoolID,freq,days,rate等数据的映射关系
 qq2schoolID:dict[str,str]={}
 qq2freq:dict[str,int]={}
