@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.manifold import TSNE
 from matplotlib import pyplot as plt
-import xlwt
+plt.rcParams['font.family']=['Microsoft YaHei']
 
 with open('hyctVec.vector','r') as f:
     data=f.readlines()
@@ -31,7 +31,11 @@ for i in range(len(dataStr)):
 length=len(schoolIDs)
 for i in range(length):
     plt.text(xs[i],ys[i],schoolIDs[i],fontsize=8)
-plt.scatter(xs,ys,s=10,marker='D')
+
+plt.scatter(xs[:5],ys[:5],s=10,marker='^',c='green',label='核心区')
+plt.scatter(xs[5:15],ys[5:15],s=10,marker='D',c='red',label='相关区')
+plt.scatter(xs[15:],ys[15:],s=10,marker='D',label='非相关区')
+plt.legend()
 plt.grid()
 plt.show()
 
