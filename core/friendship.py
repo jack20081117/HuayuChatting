@@ -2,8 +2,8 @@ from tools import *
 from matplotlib import pyplot
 import numpy,json,random
 
-info=readInfoByJson()
-chattingAllTime=info[4]
+with open('../out/chattingAllTime.txt','r') as reader:
+    chattingAllTime=json.load(reader)
 
 friends:dict[str,dict[str,int]]={}
 friendprobs:dict[str,dict[str,float]]={}

@@ -1,33 +1,5 @@
 import json,logging
 
-def readInfoByJson()->tuple:
-    #通过JSON从文件内读入数据
-    logging.info('正在读入数据......')
-    with open('../out/qq2schoolID.txt','r') as reader:
-        qq2schoolID=json.load(reader)
-    with open('../out/qq2freq.txt','r') as reader:
-        qq2freq=json.load(reader)
-    with open('../out/qq2days.txt','r') as reader:
-        qq2days=json.load(reader)
-    with open('../out/qq2rate.txt','r') as reader:
-        qq2rate=json.load(reader)
-    with open('../out/chattingAllTime.txt','r') as reader:
-        chattingAllTime=json.load(reader)
-    with open('../out/chattingAllMonths.txt','r') as reader:
-        chattingAllMonths=json.load(reader)
-    with open('../out/chattingAllWeeks.txt','r') as reader:
-        chattingAllWeeks=json.load(reader)
-    with open('../out/chattingSTTime.txt','r') as reader:
-        chattingSTTime=json.load(reader)
-    with open('../out/timeDeltas.txt','r') as reader:
-        timeDeltas=json.load(reader)
-    with open('../out/chattingAllDeltas.txt','r') as reader:
-        chattingAllDeltas=json.load(reader)
-    logging.info('读入数据完毕')
-    return qq2schoolID,qq2freq,qq2days,qq2rate,\
-           chattingAllTime,chattingAllMonths,chattingAllWeeks,chattingSTTime,\
-           timeDeltas,chattingAllDeltas
-
 def dictKey2List(d:dict)->list:
     l=[]
     for key,value in d.items():

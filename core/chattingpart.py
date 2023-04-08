@@ -1,8 +1,9 @@
 from tools import *
 
-info=readInfoByJson()
-chattingAllTime=info[4]
-chattingSTTime=info[7]
+with open('../out/chattingAllTime.txt','r') as reader:
+    chattingAllTime=json.load(reader)
+with open('../out/chattingSTTime.txt','r') as reader:
+    chattingSTTime=json.load(reader)
 
 def require(sTime,tTime,*args):
     length=len(args)

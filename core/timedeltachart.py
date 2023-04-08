@@ -2,9 +2,10 @@ import numpy
 from matplotlib import pyplot
 from tools import *
 
-info=readInfoByJson()
-timeDeltas=info[8]
-chattingAllDeltas=info[9]
+with open('../out/timeDeltas.txt','r') as reader:
+    timeDeltas=json.load(reader)
+with open('../out/chattingAllDeltas.txt','r') as reader:
+    chattingAllDeltas=json.load(reader)
 
 def paint1():
     xs=[]

@@ -4,8 +4,8 @@ from matplotlib import pyplot
 from datetime import *
 from argparse import ArgumentParser
 
-info=readInfoByJson()
-chattingAllWeeks=info[6]
+with open('../out/chattingAllWeeks.txt','r') as reader:
+    chattingAllWeeks=json.load(reader)
 schoolID2weeks:dict[str,dict[str,int]]={}
 schoolIDs=set()
 

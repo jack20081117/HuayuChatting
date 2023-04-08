@@ -1,8 +1,8 @@
 import numpy,xlwt
 from tools import *
 
-info=readInfoByJson()
-chattingAllWeeks=info[6]
+with open('../out/chattingAllWeeks.txt','r') as reader:
+    chattingAllWeeks=json.load(reader)
 
 weekIDFreqDict:dict[dict[float]]={}
 

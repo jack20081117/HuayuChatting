@@ -1,8 +1,14 @@
 import xlwt
 from tools import *
 
-info=readInfoByJson()
-qq2schoolID,qq2freq,qq2days,qq2rate=info[0:4]
+with open('../out/qq2schoolID.txt','r') as reader:
+    qq2schoolID=json.load(reader)
+with open('../out/qq2freq.txt','r') as reader:
+    qq2freq=json.load(reader)
+with open('../out/qq2days.txt','r') as reader:
+    qq2days=json.load(reader)
+with open('../out/qq2rate.txt','r') as reader:
+    qq2rate=json.load(reader)
 
 HuayuChatting=xlwt.Workbook(encoding='utf-8',style_compression=0)
 sheet=HuayuChatting.add_sheet('华育校友营',cell_overwrite_ok=True)
