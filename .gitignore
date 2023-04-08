@@ -1,6 +1,6 @@
 .idea
 in/*
-out/*
+
 core/static/img/*
 
 *.xls;xlsx;csv

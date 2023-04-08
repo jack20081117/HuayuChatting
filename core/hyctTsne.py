@@ -7,7 +7,7 @@ with open('hyctVec.vector','r') as f:
     data=f.readlines()
 
 dataStr=data[1:]
-#dataStr=dataStr[:80]
+dataStr=dataStr[:70]
 embeddinglist=[]
 schoolIDs=[]
 
@@ -28,20 +28,7 @@ for i in range(len(dataStr)):
     xs.append(nodePos[i,0])
     ys.append(nodePos[i,1])
 
-HuayuChatting=xlwt.Workbook(encoding='utf-8',style_compression=0)
-sheet=HuayuChatting.add_sheet('华育校友营',cell_overwrite_ok=True)
-
-col=('schoolID','x','y')
-for i in range(3):
-    sheet.write(0,i,col[i])
-
 length=len(schoolIDs)
-for i in range(length):
-    sheet.write(i+1,0,schoolIDs[i])
-    sheet.write(i+1,1,float(xs[i]))
-    sheet.write(i+1,2,float(ys[i]))
-
-HuayuChatting.save('../out/华育校友营降维数据.xls')
 for i in range(length):
     plt.text(xs[i],ys[i],schoolIDs[i],fontsize=8)
 plt.scatter(xs,ys,s=10,marker='D')
