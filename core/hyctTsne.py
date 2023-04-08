@@ -29,7 +29,7 @@ for i in range(len(dataStr)):
     ys.append(nodePos[i,1])
 
 length=len(schoolIDs)
-for i in range(length):
+for i in range(70):
     plt.text(xs[i],ys[i],schoolIDs[i],fontsize=8)
 
 plt.scatter(xs[:5],ys[:5],s=10,marker='^',c='green',label='核心区')
