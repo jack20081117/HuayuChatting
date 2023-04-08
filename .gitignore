@@ -4,5 +4,7 @@ core/static/img/*
 
 *.xls;xlsx;csv
 *.py[cod]
+*.model
+*.vector
 
 !.gitkeep
