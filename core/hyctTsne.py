@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
 from matplotlib import pyplot as plt
 plt.rcParams['font.family']=['Microsoft YaHei']
 
@@ -7,7 +8,8 @@ with open('hyctVec.vector','r') as f:
     data=f.readlines()
 
 dataStr=data[1:]
-dataStr=dataStr[:70]
+num=int(input('How many people do you want to show?'))
+dataStr=dataStr[:num]
 embeddinglist=[]
 schoolIDs=[]
 
@@ -18,9 +20,13 @@ for datumStr in dataStr:
     embeddinglist.append(datumList[1:])
 
 embeddinglist=np.array(embeddinglist)
-down=TSNE(n_components=2,learning_rate=300,init='pca',perplexity=10)
-
-nodePos=down.fit_transform(embeddinglist)
+algorithm=input('Use T-SNE or PCA? t/p')
+if algorithm=='t':
+    tsne=TSNE(n_components=2,learning_rate=300,init='pca',perplexity=10)
+    nodePos=tsne.fit_transform(embeddinglist)
+else:
+    pca=PCA(n_components=2,whiten=True)
+    nodePos=pca.fit_transform(embeddinglist)
 
 xs,ys=[],[]
 
@@ -29,13 +35,14 @@ for i in range(len(dataStr)):
     ys.append(nodePos[i,1])
 
 length=len(schoolIDs)
-for i in range(70):
+for i in range(min(length,70)):
     plt.text(xs[i],ys[i],schoolIDs[i],fontsize=8)
 
 plt.scatter(xs[:5],ys[:5],s=10,marker='^',c='green',label='核心区')
 plt.scatter(xs[5:15],ys[5:15],s=10,marker='D',c='red',label='相关区')
 plt.scatter(xs[15:],ys[15:],s=10,marker='D',label='非相关区')
 plt.legend()
+plt.title('T-SNE' if algorithm=='t' else 'PCA')
 plt.grid()
 plt.show()
 
