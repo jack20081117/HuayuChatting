@@ -7,18 +7,18 @@ from tools import *
 with open('../out/chattingAllWeeks.txt','r') as reader:
     chattingAllWeeks=json.load(reader)
 
-weekIDFreqDict:dict[dict[float]]={}
-weekAge:dict[str,float]={}
+weekIDFreqDict={}
+weekAge={}
 
 weekKeyID=0
-schoolID2id:dict[str,int]={}
-weekKey2id:dict[str,int]={}
+schoolID2id={}
+weekKey2id={}
 schoolIDid=0
 
 for weekKey in chattingAllWeeks:
     weekKeyID+=1
     weekKey2id[weekKey]=weekKeyID
-    schoolID2freq:dict[str,int]={}
+    schoolID2freq={}
     weekValue=chattingAllWeeks[weekKey]
     for schoolID in weekValue:
         if schoolID=='other': continue
@@ -42,8 +42,8 @@ xs,ys=[],[]
 
 for weekKey in chattingAllWeeks:
     weekValue=weekIDFreqDict[weekKey]
-    ageSum:float=0
-    decline:float=1
+    ageSum=0
+    decline=1
     for schoolID in weekValue:
         if schoolID[0]=='u':decline-=weekIDFreqDict[weekKey][schoolID]
         else:ageSum+=int(schoolID[:2])*weekIDFreqDict[weekKey][schoolID]

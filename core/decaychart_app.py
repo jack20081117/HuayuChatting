@@ -5,11 +5,11 @@ from argparse import ArgumentParser
 
 with open('../out/chattingAllWeeks.txt','r') as reader:
     chattingAllWeeks=json.load(reader)
-schoolID2weeks:dict[str,dict[str,int]]={}
+schoolID2weeks={}
 schoolIDs=set()
 
 decay=0.7
-decayedSchoolID2weeks:dict[str,dict[str,float]]={}
+decayedSchoolID2weeks={}
 
 for weekKey in chattingAllWeeks:
     weekValue=chattingAllWeeks[weekKey]

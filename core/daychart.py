@@ -5,7 +5,7 @@ from datetime import *
 
 with open('../out/chattingAllDays.txt','r') as reader:
     chattingAllDays=json.load(reader)
-schoolID2days:dict[str,dict[str,int]]={}
+schoolID2days={}
 schoolIDs=set()
 
 for dayKey in chattingAllDays:

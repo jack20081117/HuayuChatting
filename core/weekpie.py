@@ -7,14 +7,14 @@ with open('../out/chattingAllWeeks.txt','r') as reader:
     chattingAllWeeks=json.load(reader)
 
 def paint(weekKey,nextKey):
-    schoolID2freq:dict[str,int]={}
+    schoolID2freq={}
     weekValue=chattingAllWeeks[weekKey]
     for schoolID in weekValue:
          if schoolID=='other':continue
          if not schoolID in schoolID2freq:schoolID2freq[schoolID]=0
          schoolID2freq[schoolID]+=1
     sortedFreq=sortByValue(schoolID2freq)
-    freqsum:int=0
+    freqsum=0
     for i in range(len(sortedFreq)):
         freqsum+=sortedFreq[i][1]
     schoolIDList=[]

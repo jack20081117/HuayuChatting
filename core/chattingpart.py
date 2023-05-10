@@ -7,9 +7,9 @@ with open('../out/chattingSTTime.txt','r') as reader:
 
 def require(sTime,tTime,*args):
     length=len(args)
-    schoolIDs:list[str]=[]
-    #probabilities:list[float]=[]
-    s2pDict:dict[str,float]={}
+    schoolIDs=[]
+    #probabilities=[]
+    s2pDict={}
     for id in range(0,length,2):
         schoolID=args[id]
         probability=args[id+1]
@@ -25,7 +25,7 @@ def require(sTime,tTime,*args):
         chattingEachPart=chattingAllTime[partId]
         partlength=len(chattingEachPart)
         if partlength<=10:continue
-        s2fDict:dict[str,int]={}
+        s2fDict={}
         for schoolID in chattingEachPart:
             if schoolID=='other':continue
             if not schoolID in s2fDict:s2fDict[schoolID]=0

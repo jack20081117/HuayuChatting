@@ -4,10 +4,10 @@ from tools import *
 with open('../out/chattingAllDays.txt','r') as reader:
     chattingAllDays=json.load(reader)
 
-dayIDFreqDict:dict[dict[float]]={}
+dayIDFreqDict={}
 dayKeyID=0
-schoolID2id:dict[str,int]={}
-dayKey2id:dict[str,int]={}
+schoolID2id={}
+dayKey2id={}
 schoolIDid=0
 
 for dayKey in chattingAllDays:

@@ -6,13 +6,13 @@ from tools import *
 
 inputFilename=['../in/'+x for x in os.listdir('../in') if os.path.splitext(x)[1]=='.txt']
 #下面几个dict存储qq和schoolID,freq,days,rate等数据的映射关系
-qq2schoolID:dict[str,str]={}
-qq2freq:dict[str,int]={}
-qq2days:dict[str,list[str]]={}
-qq2rate:dict[str,float]={}
+qq2schoolID={}
+qq2freq={}
+qq2days={}
+qq2rate={}
 
 unknown:int=0#未知学号的qq号个数
-unknownqqs:list[str]=[]#未知学号的qq号
+unknownqqs=[]#未知学号的qq号
 
 timeDelta=120
 #默认如果两条消息相隔大于等于2分钟，则分属两个不同的对话part
@@ -25,23 +25,23 @@ weekDelta=604800#一周的秒数
 weekStartTimestamp=1581782400#2020-02-16 00:00:00时的timestamp
 chattingStartTimeStamp=1581859176#2020-02-16 21:19:36时的timestamp
 
-timeDeltas:list[int]=[]
+timeDeltas=[]
 
-chattingEachPart:list[str]=[]
-chattingStartTime:list[str]=[]
-chattingEndTime:list[str]=[]
-chattingAllTime:list[list[str]]=[]
+chattingEachPart=[]
+chattingStartTime=[]
+chattingEndTime=[]
+chattingAllTime=[]
 
-chattingEachMonth:list[str]=[]
-chattingAllMonths:dict[str,list[str]]={}
+chattingEachMonth=[]
+chattingAllMonths={}
 
-chattingEachWeek:list[str]=[]
-chattingAllWeeks:dict[str,list[str]]={}
+chattingEachWeek=[]
+chattingAllWeeks={}
 
-chattingEachDay:list[str]=[]
-chattingAllDays:dict[str,list[str]]={}
+chattingEachDay=[]
+chattingAllDays={}
 
-chattingAllDeltas:dict[int,int]={}
+chattingAllDeltas={}
 
 def generateUnknown(unknownqq):#生成未知学号的schoolID
     #原则上使用unknown1,unknown2等等
@@ -54,7 +54,7 @@ def generateUnknown(unknownqq):#生成未知学号的schoolID
         unknownqqs.append(unknownqq)
         return 'unknown'+str(unknown)
 
-def searchQQ(line:str)->str:
+def searchQQ(line):
     #寻找消息头中蕴含的qq号信息
     #由于可能有部分人在昵称中加入半角括号,所以从消息头末尾开始匹配
     #注意这里相反,是要先找下括号")"再找上括号"("
@@ -63,7 +63,7 @@ def searchQQ(line:str)->str:
     rqq=re.search(r'(?<=[)>])[^(<]+',rline).group()
     return rqq[::-1]
 
-def extractHead(filepaths:list[str])->list[str]:
+def extractHead(filepaths):
     resList=[]
     for filepath in filepaths:
         with open(filepath,'r',encoding='utf-8',errors='ignore') as reader:
@@ -73,7 +73,7 @@ def extractHead(filepaths:list[str])->list[str]:
     resSet=set(resList)
     return sorted(resSet)
 
-def extract(filepaths:list):
+def extract(filepaths):
     #提取数据核心模块
     logging.info('正在提取数据......')
     global chattingEachPart,chattingAllTime,chattingStartTime,chattingEndTime

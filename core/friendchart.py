@@ -1,7 +1,7 @@
 import json,xlwt
 
 with open('../out/friendprobs_calc.txt','r') as reader:
-    friendprobs_calc: dict[str,dict[str,float]]=json.load(reader)
+    friendprobs_calc=json.load(reader)
 
 HuayuFriends=xlwt.Workbook(encoding='utf-8',style_compression=0)
 sheet=HuayuFriends.add_sheet('华育校友营相似度',cell_overwrite_ok=True)
@@ -16,7 +16,7 @@ schoolIDs_part=[
     '21159','20352','21361','24885'
 ]
 schoolIDs=[]
-schoolID4num:dict[int,str]={}
+schoolID4num={}
 
 for schoolID in friendprobs_calc:
     schoolIDs.append(schoolID)

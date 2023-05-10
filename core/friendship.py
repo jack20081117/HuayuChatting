@@ -5,9 +5,9 @@ import numpy,json,random
 with open('../out/chattingAllTime.txt','r') as reader:
     chattingAllTime=json.load(reader)
 
-friends:dict[str,dict[str,int]]={}
-friendprobs:dict[str,dict[str,float]]={}
-friendprobs_calc:dict[str,dict[str,float]]={}
+friends={}
+friendprobs={}
+friendprobs_calc={}
 
 parts=len(chattingAllTime)
 

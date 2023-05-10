@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 
 with open('../out/chattingAllWeeks.txt','r') as reader:
     chattingAllWeeks=json.load(reader)
-schoolID2weeks:dict[str,dict[str,int]]={}
+schoolID2weeks={}
 schoolIDs=set()
 
 for weekKey in chattingAllWeeks:
