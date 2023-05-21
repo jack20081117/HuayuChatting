@@ -1,4 +1,4 @@
-import re,logging,os
+import re,logging,os,json
 from tqdm import tqdm
 from datetime import *
 logging.basicConfig(level=logging.INFO)
@@ -22,8 +22,8 @@ maxDelta=120
 
 
 weekDelta=604800#一周的秒数
-weekStartTimestamp=1581782400#2020-02-16 00:00:00时的timestamp
-chattingStartTimeStamp=1581859176#2020-02-16 21:19:36时的timestamp
+weekStartTimestamp=1564761600#2019-08-03 00:00:00时的timestamp
+chattingStartTimeStamp=1564765338#2020-08-03 01:02:18时的timestamp
 
 timeDeltas=[]
 
