@@ -3,6 +3,12 @@ in/*
 
 core/static/img/*
 
+go-cqhttp/*
+
+!go-cqhttp/main.py
+!go-cqhttp/script.py
+!go-cqhttp/sql.py
+
 *.xls;xlsx;csv
 *.py[cod]
 *.model
