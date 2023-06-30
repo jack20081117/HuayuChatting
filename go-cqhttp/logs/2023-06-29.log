@@ -1,0 +1,19 @@
+[2023-06-29 12:39:54] [WARNING]: Protocol -> device lock is disable. http api may fail. 
+[2023-06-29 13:18:33] [WARNING]: Protocol -> device lock is disable. http api may fail. 
+[2023-06-29 15:04:30] [WARNING]: Protocol -> device lock is disable. http api may fail. 
+[2023-06-29 15:28:28] [WARNING]: 群消息发送失败: 账号可能被风控. 
+[2023-06-29 15:28:52] [WARNING]: 群消息发送失败: 账号可能被风控. 
+[2023-06-29 15:29:49] [WARNING]: 群消息发送失败: 账号可能被风控. 
+[2023-06-29 15:33:48] [WARNING]: 群消息发送失败: 账号可能被风控. 
+[2023-06-29 19:41:51] [WARNING]: Protocol -> device lock is disable. http api may fail. 
+[2023-06-29 19:42:00] [WARNING]: 上报 Event 数据到 http://127.0.0.1:5701/ 失败: Post "http://127.0.0.1:5701/": dial tcp 127.0.0.1:5701: connectex: No connection could be made because the target machine actively refused it. 将进行第 1 次重试 
+[2023-06-29 19:42:03] [WARNING]: 上报 Event 数据到 http://127.0.0.1:5701/ 失败: Post "http://127.0.0.1:5701/": dial tcp 127.0.0.1:5701: connectex: No connection could be made because the target machine actively refused it. 将进行第 2 次重试 
+[2023-06-29 19:42:07] [WARNING]: 上报 Event 数据到 http://127.0.0.1:5701/ 失败: Post "http://127.0.0.1:5701/": dial tcp 127.0.0.1:5701: connectex: No connection could be made because the target machine actively refused it. 将进行第 3 次重试 
+[2023-06-29 19:42:11] [WARNING]: 上报 Event 数据 {"post_type":"meta_event","meta_event_type":"heartbeat","time":1688038918,"self_id":2470751924,"status":{"app_enabled":true,"app_good":true,"app_initialized":true,"good":true,"online":true,"plugins_good":null,"stat":{"packet_received":26,"packet_sent":18,"packet_lost":0,"message_received":0,"message_sent":0,"disconnect_times":0,"lost_times":0,"last_message_time":0}},"interval":5000}
+ 到 http://127.0.0.1:5701/ 失败: Post "http://127.0.0.1:5701/": dial tcp 127.0.0.1:5701: connectex: No connection could be made because the target machine actively refused it. 停止上报：已达重试上限 
+[2023-06-29 19:42:13] [WARNING]: 上报 Event 数据到 http://127.0.0.1:5701/ 失败: Post "http://127.0.0.1:5701/": dial tcp 127.0.0.1:5701: connectex: No connection could be made because the target machine actively refused it. 将进行第 1 次重试 
+[2023-06-29 19:42:16] [WARNING]: 上报 Event 数据到 http://127.0.0.1:5701/ 失败: Post "http://127.0.0.1:5701/": dial tcp 127.0.0.1:5701: connectex: No connection could be made because the target machine actively refused it. 将进行第 2 次重试 
+[2023-06-29 19:42:30] [WARNING]: 群消息发送失败: 账号可能被风控. 
+[2023-06-29 19:43:11] [ERROR]: Protocol -> unexpected disconnect: read tcp 192.168.1.4:54842->36.155.205.230:8080: wsarecv: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. 
+[2023-06-29 21:06:51] [WARNING]: Protocol -> device lock is disable. http api may fail. 
+[2023-06-29 21:32:47] [WARNING]: 上报 Event 数据到 http://127.0.0.1:5701/ 失败: Post "http://127.0.0.1:5701/": dial tcp 127.0.0.1:5701: connectex: No connection could be made because the target machine actively refused it. 将进行第 1 次重试 
