@@ -3,14 +3,14 @@ from datetime import datetime
 from sql import *
 import sqlite3
 import random
+import os,json
 from bs4 import BeautifulSoup as BS
-from .. .HuayuChatting import core
 
 group_ids=[734894275,719772033]
 headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.58'}
 
-def weekchart():
-    pass
+with open('../out/qq2schoolID.txt','r') as reader:
+    qq2schoolID=json.load(reader)
 
 def handle(res,group):
     ans=''
@@ -71,6 +71,31 @@ def handle(res,group):
                     cursor=conn.cursor()
                     cursor.execute(insertQA%(question,answer))
                     ans="插入问答成功！"
+            elif func_str=='今日人品':
+                num=random.randint(1,100)
+                if num<=20:
+                    ans='真糟糕，你今天的人品值只有%d！做了什么亏心事？'%num
+                elif num<=40:
+                    ans='很遗憾，你今天的人品值只有%d。快点攒攒人品吧！'%num
+                elif num<=60:
+                    ans='哎呀，你今天的人品值为%d。要继续努力呀！'%num
+                elif num<=80:
+                    ans='嗯，你今天的人品值为%d。还有上升空间！'%num
+                elif num<=99:
+                    ans='很不错，你今天的人品值为%d。请继续保持哦！'%num
+                else:
+                    ans='天哪！你今天的人品值是100！100！100！恭喜！'
+            elif func_str=='weekchart':
+                if len(message_list)!=3:
+                    send(gid,'请以正确方式查询weekchart！',group=True)
+                    return None
+                schoolID=message_list[2]
+                if schoolID not in qq2schoolID.values():
+                    send(gid,'抱歉，查无此人！',group=True)
+                    return None
+                os.system('cd ../core')
+                os.system('python weekchart_app.py --id %s'%schoolID)
+                ans='[CQ:image,file=weekchart.png]'
             elif func_str=='help' or func_str=='帮助':
                 ans='您好！欢迎使用森bot！\n'
                 ans+='您可以使用如下功能：\n'
@@ -98,7 +123,7 @@ def handle(res,group):
                         for i in range(len(answers)):
                             answer=answers[i]
                             ans+='No.%d:%s\n'%(i+1,answer)
-            send(gid,ans,group=True)
+            send(gid,'[CQ:at,qq=%s]'%uid+ans,group=True)
     else:
         message=res.get("raw_message")
         uid=res.get('sender').get('user_id')

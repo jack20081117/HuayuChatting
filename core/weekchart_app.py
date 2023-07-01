@@ -38,6 +38,7 @@ def paint(schoolID):
     pyplot.plot_date(xs,ys,linestyle='-',marker='.')
     pyplot.title(schoolID)
     pyplot.savefig("./static/img/weekchart.png")
+    pyplot.savefig("../go-cqhttp/data/images/weekchart.png")
 
 if __name__=='__main__':
     parser=ArgumentParser()
