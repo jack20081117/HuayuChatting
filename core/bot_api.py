@@ -1,5 +1,5 @@
 from flask import Flask,request,redirect
-import script
+import bot_script
 
 app=Flask(__name__)
 
@@ -8,9 +8,9 @@ def post():
     # 这里对消息进行分发，暂时先设置一个简单的分发
     res=request.get_json()
     if res.get('message_type')=='private':  # 说明有好友发送信息过来
-        script.handle(res,group=False)
+        bot_script.handle(res,group=False)
     elif res.get('message_type')=='group':
-        script.handle(res,group=True)
+        bot_script.handle(res,group=True)
 
     return 'OK'
 
