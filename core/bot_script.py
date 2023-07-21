@@ -1,33 +1,36 @@
 import requests
 from datetime import datetime
-from sql import *
+from bot_sql import *
 import sqlite3
-import random
+import random,socket
 import os,json
+import sympy
+from sympy.abc import *
 from bs4 import BeautifulSoup
 
-group_ids=[734894275,719772033]
+group_ids=[734894275,719772033,788951477,780474840]
 headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.58'}
 
 with open('../out/qq2schoolID.txt','r') as reader:
     qq2schoolID=json.load(reader)
 
 def getWeather():
-    res=requests.get('http://www.weather.com.cn/weather15d/101020100.shtml')
+    res=requests.get('http://www.weather.com.cn/weather/101020100.shtml')
     res.encoding='utf-8'
     html=res.text
     soup=BeautifulSoup(html,'html.parser')  #解析文档
-    weathers=soup.find(id="15d",class_="c15d").find('ul',class_="t clearfix").find_all('li')
+    weathers=soup.find(id="7d",class_="c7d").find('ul',class_="t clearfix").find_all('li')
     results=[]
     for weather in weathers:
-        weather_date=weather.find('span',class_="time")
-        weather_wea=weather.find('span',class_="wea")
-        weather_tem=weather.find('span',class_="tem")
-        weather_wind=weather.find('span',class_="wind")
-        weather_wind1=weather.find('span',class_="wind1")
-        result='日期：'+weather_date.text+'天气：'+weather_wea.text+'温度：'+weather_tem.text+'风力：'+weather_wind.text+weather_wind1.text
+        weather_date=weather.find('h1')
+        weather_wea=weather.find('p',class_="wea")
+        weather_tem=weather.find('p',class_="tem").find('span')
+        weather_wind=weather.find('p',class_="win").find('i')
+        result='日期：'+weather_date.text+',天气：'+weather_wea.text+',温度：'+weather_tem.text+',风力：'+weather_wind.text
         results.append(str(result))
     return results
+
+
 
 def handle(res,group):
     ans=''
@@ -116,6 +119,25 @@ def handle(res,group):
                     return None
                 os.system('python weekchart_app.py --id %s'%schoolID)
                 ans='[CQ:image,file=weekchart.png]'
+            elif func_str=='绘图':
+                if len(message_list)!=3:
+                    send(gid,'请以正确方式绘图！',group=True)
+                    return None
+                f=message_list[2].replace('^','**')
+                print(f)
+                sympy.plot(eval(f),show=False).save("../go-cqhttp/data/images/formula.png")
+                ans='[CQ:image,file=formula.png]'
+            elif func_str=='寻找发言者':
+                if len(message_list)!=3:
+                    send(gid,'请以正确方式寻找发言者！',group=True)
+                    return None
+                s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+                s.connect(('127.0.0.1',9999))
+                sentence=message_list[2]
+                s.send(sentence.encode('utf-8'))
+                ans=s.recv(10000).decode('utf-8')
+                s.send(b'exit()')
+                s.close()
             elif func_str=='help' or func_str=='帮助':
                 ans='您好！欢迎使用森bot！\n'
                 ans+='您可以使用如下功能：\n'
@@ -124,7 +146,10 @@ def handle(res,group):
                 ans+='3:查询数据：输入 查询数据 `编号` `id`来查询编号为id的数据\n'
                 ans+='4.1:添加问答：输入 添加问答 `问题` `答案`\n'
                 ans+='4.2:问问题：输入 `问题`来得到答案\n'
-                ans+='5.1:Weekchart：输入 weekchart `学号`来得到该人的weekchart'
+                ans+='5.1:Weekchart：输入 weekchart `学号`来得到该人的weekchart\n'
+                ans+='6.1:绘图：输入 绘图 `一个关于x的代数式` 来得到它的图像\n'
+                ans+='7:今日人品：输入 今日人品 来测测你今天的人品吧！\n'
+                ans+='8:天气：输入 天气 来得到近7天上海的天气情况\n'
             else:
                 answers=[]
                 with sqlite3.connect('text.db') as conn:
@@ -188,6 +213,29 @@ def handle(res,group):
                 cursor=conn.cursor()
                 cursor.execute(insertQA%(question,answer))
                 ans="插入问答成功！"
+        elif func_str=='天气' or func_str=='weather':
+            results=getWeather()
+            ans='上海近一周天气情况：\n'
+            ans+='\n'.join(results)
+        elif func_str=='绘图':
+            x=sympy.Symbol('x')
+            if len(message_list)!=2:
+                send(uid,'请以正确方式绘图！',group=False)
+                return None
+            f=message_list[1].replace('^','**')
+            print(f)
+            sympy.plot(eval(f),show=False).save("../go-cqhttp/data/images/formula.png")
+            ans='[CQ:image,file=formula.png]'
+        elif func_str=='weekchart':
+            if len(message_list)!=2:
+                send(uid,'请以正确方式查询weekchart！',group=False)
+                return None
+            schoolID=message_list[1]
+            if schoolID not in qq2schoolID.values():
+                send(uid,'抱歉，查无此人！',group=False)
+                return None
+            os.system('python weekchart_app.py --id %s'%schoolID)
+            ans='[CQ:image,file=weekchart.png]'
         elif func_str=='help' or func_str=='帮助':
             ans='您好！欢迎使用森bot！\n'
             ans+='您可以使用如下功能：\n'
@@ -195,7 +243,11 @@ def handle(res,group):
             ans+='2:插入数据：输入 插入数据 `主语` `谓语` `宾语`\n'
             ans+='3:查询数据：输入 查询数据 `编号` `id`来查询编号为id的数据\n'
             ans+='4.1:添加问答：输入 添加问答 `问题` `答案`\n'
-            ans+='4.2:问问题：输入 `问题`来得到答案'
+            ans+='4.2:问问题：输入 `问题`来得到答案\n'
+            ans+='5.1:Weekchart：输入 weekchart `学号`来得到该人的weekchart\n'
+            ans+='6.1:绘图：输入 绘图 `一个关于x的代数式` 来得到它的图像\n'
+            ans+='7:今日人品：输入 今日人品 来测测你今天的人品吧！\n'
+            ans+='8:天气：输入 天气 来得到近7天上海的天气情况\n'
         else:
             answers=[]
             with sqlite3.connect('text.db') as conn:
