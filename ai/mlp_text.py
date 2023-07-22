@@ -5,15 +5,35 @@ import logging
 logging.basicConfig(level=logging.INFO)
 from datetime import datetime
 from tqdm import tqdm
-from extractor import searchQQ
 from jieba import analyse
 from keras.preprocessing.text import Tokenizer
 import tensorflow as tf
 from keras.models import Sequential,load_model
 from keras.layers import Dense,Dropout,Activation,Flatten,MaxPool1D,Conv1D,Embedding,BatchNormalization
 from matplotlib import pyplot as plt
+from sklearn.naive_bayes import MultinomialNB,GaussianNB,BernoulliNB
+from sklearn.ensemble import RandomForestClassifier
 
 ifLoadModel=True
+ifShowAcc=False
+useBayes=False#贝叶斯算法，效果不如CNN
+useRF=False#随机森林，效果不如CNN
+
+def label_dataset(row):
+    num_label=label.index(row)
+    return num_label
+
+def keyWordExtract(texts):
+    return str(' '.join(analyse.extract_tags(texts,topK=20,withWeight=False,allowPOS=())))
+
+def searchQQ(line):
+    #寻找消息头中蕴含的qq号信息
+    #由于可能有部分人在昵称中加入半角括号,所以从消息头末尾开始匹配
+    #注意这里相反,是要先找下括号")"再找上括号"("
+    #结尾别忘了把找到的qq号重新倒过来
+    rline=line[::-1]
+    rqq=re.search(r'(?<=[)>])[^(<]+',rline).group()
+    return rqq[::-1]
 
 filepath='../in/log.txt'
 schoolIDpath='../out/qq2schoolID.txt'
@@ -39,6 +59,8 @@ for i in progress:
     if qq not in qq2schoolID:
         continue
     schoolID=qq2schoolID[qq]
+    if schoolID[:2]=='un':
+        continue
     content=data_content[i]
     content=re.sub(r'\n','',content)
     content=re.sub(r'@\S+','',content)
@@ -54,33 +76,37 @@ for i in progress:
     )
 
 dataframe=pd.DataFrame(dataframeJson)
-
-#dataframe=dataframe.head(1000)
-
 label=list(dataframe['schoolID'].unique())
-
-def label_dataset(row):
-    num_label=label.index(row)
-    return num_label
-
 dataframe['label']=dataframe['schoolID'].apply(label_dataset)
-
-def keyWordExtract(texts):
-    return ' '.join(analyse.extract_tags(texts,topK=20,withWeight=False,allowPOS=()))
-
 dataframe['key_word']=dataframe['content'].apply(keyWordExtract)
 
+#dataframe.to_csv("mlp_text.csv")
+
+logging.info('Creating Tokenizer...')
 token=Tokenizer(num_words=2000)
 token.fit_on_texts(dataframe['key_word'])
 
 text2seq=token.texts_to_sequences(dataframe['key_word'])
 text2seq=tf.keras.preprocessing.sequence.pad_sequences(text2seq,maxlen=20)
 
-x_train=text2seq
-y_train=np.array(dataframe['label'].to_list())
+x_train=np.array(text2seq,dtype=np.int16)
+y_train=np.array(dataframe['label'].to_list(),dtype=np.int16)
+
+test_size=int(len(x_train)*0.8)
+x_test,y_test=x_train[test_size:],y_train[test_size:]
 
 maxLabel=max(dataframe['label'].to_list())
-if not ifLoadModel:
+if useRF:
+    logging.info('Building Random Forest Classifier...')
+    model=RandomForestClassifier(random_state=1,n_estimators=20,criterion='entropy',max_depth=8)
+    model.fit(x_train,y_train)
+    logging.info('模型得分:%s'%model.score(x_test,y_test))
+elif useBayes:
+     logging.info('Building Bayes Model...')
+     model=BernoulliNB()
+     model.fit(x_train,y_train)
+elif not ifLoadModel:
+    logging.info('Building CNN Model...')
     model=Sequential()
     model.add(Embedding(output_dim=32,input_dim=2000,input_length=20))
     model.add(Conv1D(256,3,padding='same',activation='relu'))
@@ -94,7 +120,7 @@ if not ifLoadModel:
     model.add(Dense(units=maxLabel+1,activation='softmax'))
 
     batchSize=256
-    epochs=15
+    epochs=5
 
     model.summary()
     model.compile(loss='sparse_categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
@@ -109,28 +135,30 @@ if not ifLoadModel:
 
     model.save('mlp_text.h5')
 
-    plt.plot(history.history['accuracy'])
-    plt.plot(history.history['val_accuracy'])
-    plt.title('Model Accuracy')
-    plt.xlabel('Epoch')
-    plt.ylabel('Accuracy')
-    plt.legend(['Train','Valid'],loc='upper left')
-    plt.show()
+    if ifShowAcc:
+        plt.plot(history.history['accuracy'])
+        plt.plot(history.history['val_accuracy'])
+        plt.title('Model Accuracy')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.legend(['Train','Valid'],loc='upper left')
+        plt.show()
 
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('Model Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.legend(['Train','Valid'],loc='upper left')
-    plt.show()
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('Model Loss')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.legend(['Train','Valid'],loc='upper left')
+        plt.show()
 else:
+    logging.info('Loading Model...')
     model=load_model("mlp_text.h5")
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.bind(('127.0.0.1',9999))
+s.bind(('127.0.0.1',9999))#通过TCP编程实现和机器人的通讯
 
-useBot=True
+useBot=False
 
 def tcplink(sock,addr):
     logging.info('Accept new connection from %s:%s...'%addr)
@@ -164,7 +192,13 @@ else:
         sentence=input('Sentence:')
         sequence=token.texts_to_sequences([keyWordExtract(sentence)])
         sequence=tf.keras.preprocessing.sequence.pad_sequences(sequence,maxlen=20)
-        l=list(model.predict(sequence)[0])
+        prediction=model.predict(sequence)
+        if useBayes or useRF:
+            num=int(prediction)
+            schoolID=dataframe[dataframe.label==num]["schoolID"].to_list()[0]
+            print('schoolID:%s'%(schoolID))
+            continue
+        l=list(prediction[0])
         num=l.index(max(l))
         schoolID=dataframe[dataframe.label==num]["schoolID"].to_list()[0]
         if max(l)>0.1:

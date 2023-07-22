@@ -50,7 +50,7 @@ def handle(res,group):
                     send(gid,'数据必须以主语 谓语 宾语形式进行插入！',group=True)
                     return None
                 subject,verb,object=message_list[2:]
-                with sqlite3.connect('text.db') as conn:
+                with sqlite3.connect('../core/text.db') as conn:
                     cursor=conn.cursor()
                     cursor.execute('select * from sentence')
                     sentences=cursor.fetchall()
@@ -64,7 +64,7 @@ def handle(res,group):
                 sub_func_str=message_list[2]
                 if sub_func_str=='id':
                     id=message_list[3]
-                    with sqlite3.connect('text.db') as conn:
+                    with sqlite3.connect('../core/text.db') as conn:
                         cursor=conn.cursor()
                         cursor.execute(selectByID,(id,))
                         value=cursor.fetchall()
@@ -87,7 +87,7 @@ def handle(res,group):
                     send(gid,'请按照合适格式进行添加问答！',group=True)
                     return None
                 question,answer=message_list[2:]
-                with sqlite3.connect('text.db') as conn:
+                with sqlite3.connect('../core/text.db') as conn:
                     cursor=conn.cursor()
                     cursor.execute(insertQA%(question,answer))
                     ans="插入问答成功！"
@@ -152,7 +152,7 @@ def handle(res,group):
                 ans+='8:天气：输入 天气 来得到近7天上海的天气情况\n'
             else:
                 answers=[]
-                with sqlite3.connect('text.db') as conn:
+                with sqlite3.connect('../core/text.db') as conn:
                     cursor=conn.cursor()
                     cursor.execute(selectQA,(func_str,))
                     replies=cursor.fetchall()
@@ -182,7 +182,7 @@ def handle(res,group):
                 send(uid,'数据必须以主语 谓语 宾语形式进行插入！',group=False)
                 return None
             subject,verb,object=message_list[1:]
-            with sqlite3.connect('text.db') as conn:
+            with sqlite3.connect('../core/text.db') as conn:
                 cursor=conn.cursor()
                 cursor.execute('select * from sentence')
                 sentences=cursor.fetchall()
@@ -196,7 +196,7 @@ def handle(res,group):
             sub_func_str=message_list[1]
             if sub_func_str=='id':
                 id=message_list[2]
-                with sqlite3.connect('text.db') as conn:
+                with sqlite3.connect('../core/text.db') as conn:
                     cursor=conn.cursor()
                     cursor.execute(selectByID,(id,))
                     value=cursor.fetchall()
@@ -209,7 +209,7 @@ def handle(res,group):
                 send(uid,'请按照合适格式进行添加问答！',group=False)
                 return None
             question,answer=message_list[2:]
-            with sqlite3.connect('text.db') as conn:
+            with sqlite3.connect('../core/text.db') as conn:
                 cursor=conn.cursor()
                 cursor.execute(insertQA%(question,answer))
                 ans="插入问答成功！"
@@ -250,7 +250,7 @@ def handle(res,group):
             ans+='8:天气：输入 天气 来得到近7天上海的天气情况\n'
         else:
             answers=[]
-            with sqlite3.connect('text.db') as conn:
+            with sqlite3.connect('../core/text.db') as conn:
                 cursor=conn.cursor()
                 cursor.execute(selectQA,(func_str,))
                 replies=cursor.fetchall()

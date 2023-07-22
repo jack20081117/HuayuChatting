@@ -1,7 +1,7 @@
 .idea
 in/*
 
-core/static/img/*
+app/static/img/*
 
 go-cqhttp/*
 
