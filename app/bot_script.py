@@ -5,7 +5,9 @@ import sqlite3
 import random,socket
 import os,json
 import sympy
-from sympy.abc import *
+from sympy import sin,cos,tan,asin as arcsin,acos as arccos,atan as arctan,sinh,cosh,tanh
+from numpy import e
+from sympy.abc import x
 from bs4 import BeautifulSoup
 
 group_ids=[734894275,719772033,788951477,780474840]
@@ -120,12 +122,22 @@ def handle(res,group):
                 os.system('python weekchart_app.py --id %s'%schoolID)
                 ans='[CQ:image,file=weekchart.png]'
             elif func_str=='绘图':
-                if len(message_list)!=3:
-                    send(gid,'请以正确方式绘图！',group=True)
+                if not 3<=len(message_list)<=4:
+                    send(uid,'请以正确方式绘图！',group=False)
                     return None
-                f=message_list[2].replace('^','**')
-                print(f)
-                sympy.plot(eval(f),show=False).save("../go-cqhttp/data/images/formula.png")
+                f=message_list[2].replace('^','**').replace('，',',').replace('（','(').replace('）',')')
+                xlim=ylim=None
+                if len(message_list)==4:
+                    lim=message_list[3].split('&amp;')
+                    xlim,ylim=eval(lim[0]),eval(lim[1])
+                if f[0]!='[': f='['+f
+                if f[-1]!=']': f+=']'
+                if not xlim: xlim=(-10,10)
+                if not ylim: ylim=(-5,5)
+                print(xlim)
+                sympy.plot(*eval(f),(x,*xlim),
+                           show=False,xlabel='x',ylabel='y',ylim=ylim,title=message_list[1]).save(
+                    "../go-cqhttp/data/images/formula.png")
                 ans='[CQ:image,file=formula.png]'
             elif func_str=='寻找发言者':
                 if len(message_list)!=3:
@@ -147,9 +159,10 @@ def handle(res,group):
                 ans+='4.1:添加问答：输入 添加问答 `问题` `答案`\n'
                 ans+='4.2:问问题：输入 `问题`来得到答案\n'
                 ans+='5.1:Weekchart：输入 weekchart `学号`来得到该人的weekchart\n'
-                ans+='6.1:绘图：输入 绘图 `一个关于x的代数式` 来得到它的图像\n'
+                ans+='6.1:绘图：输入 绘图 `一个关于x的代数式` `x的范围`&`y的范围` 来得到它的图像（如果不想自定义范围，`x的范围`&`y的范围`不需要输入）\n'
                 ans+='7:今日人品：输入 今日人品 来测测你今天的人品吧！\n'
                 ans+='8:天气：输入 天气 来得到近7天上海的天气情况\n'
+                ans+='9:寻找发言者：输入 `句子` 来得到最有可能的发言者！\n'
             else:
                 answers=[]
                 with sqlite3.connect('../core/text.db') as conn:
@@ -218,13 +231,21 @@ def handle(res,group):
             ans='上海近一周天气情况：\n'
             ans+='\n'.join(results)
         elif func_str=='绘图':
-            x=sympy.Symbol('x')
-            if len(message_list)!=2:
+            if not 2<=len(message_list)<=3:
                 send(uid,'请以正确方式绘图！',group=False)
                 return None
-            f=message_list[1].replace('^','**')
-            print(f)
-            sympy.plot(eval(f),show=False).save("../go-cqhttp/data/images/formula.png")
+            f=message_list[1].replace('^','**').replace('，',',').replace('（','(').replace('）',')')
+            xlim=ylim=None
+            if len(message_list)==3:
+                lim=message_list[2].split('&amp;')
+                xlim,ylim=eval(lim[0]),eval(lim[1])
+            if f[0]!='[':f='['+f
+            if f[-1]!=']':f+=']'
+            if not xlim:xlim=(-10,10)
+            if not ylim:ylim=(-5,5)
+            print(xlim)
+            sympy.plot(*eval(f),(x,*xlim),
+                       show=False,xlabel='x',ylabel='y',ylim=ylim,title=message_list[1]).save("../go-cqhttp/data/images/formula.png")
             ans='[CQ:image,file=formula.png]'
         elif func_str=='weekchart':
             if len(message_list)!=2:
@@ -245,7 +266,7 @@ def handle(res,group):
             ans+='4.1:添加问答：输入 添加问答 `问题` `答案`\n'
             ans+='4.2:问问题：输入 `问题`来得到答案\n'
             ans+='5.1:Weekchart：输入 weekchart `学号`来得到该人的weekchart\n'
-            ans+='6.1:绘图：输入 绘图 `一个关于x的代数式` 来得到它的图像\n'
+            ans+='6.1:绘图：输入 绘图 `一个关于x的代数式` `x的范围`&`y的范围` 来得到它的图像（如果不想自定义范围，`x的范围`&`y的范围`不需要输入）\n'
             ans+='7:今日人品：输入 今日人品 来测测你今天的人品吧！\n'
             ans+='8:天气：输入 天气 来得到近7天上海的天气情况\n'
         else:
