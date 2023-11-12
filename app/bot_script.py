@@ -134,9 +134,8 @@ def handle(res,group):
                 if f[-1]!=']': f+=']'
                 if not xlim: xlim=(-10,10)
                 if not ylim: ylim=(-5,5)
-                print(xlim)
                 sympy.plot(*eval(f),(x,*xlim),
-                           show=False,xlabel='x',ylabel='y',ylim=ylim,title=message_list[1]).save(
+                           show=False,xlabel='x',ylabel='y',ylim=ylim,title=message_list[2]).save(
                     "../go-cqhttp/data/images/formula.png")
                 ans='[CQ:image,file=formula.png]'
             elif func_str=='寻找发言者':
@@ -218,10 +217,10 @@ def handle(res,group):
                     else:
                         ans='抱歉，没有找到ID为%s的数据'%id
         elif func_str=='添加问答':
-            if len(message_list)!=4:
+            if len(message_list)!=3:
                 send(uid,'请按照合适格式进行添加问答！',group=False)
                 return None
-            question,answer=message_list[2:]
+            question,answer=message_list[1:]
             with sqlite3.connect('../core/text.db') as conn:
                 cursor=conn.cursor()
                 cursor.execute(insertQA%(question,answer))
@@ -243,7 +242,6 @@ def handle(res,group):
             if f[-1]!=']':f+=']'
             if not xlim:xlim=(-10,10)
             if not ylim:ylim=(-5,5)
-            print(xlim)
             sympy.plot(*eval(f),(x,*xlim),
                        show=False,xlabel='x',ylabel='y',ylim=ylim,title=message_list[1]).save("../go-cqhttp/data/images/formula.png")
             ans='[CQ:image,file=formula.png]'
