@@ -1,5 +1,5 @@
 from tools import *
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
 import numpy,json,random
 
 with open('../out/chattingAllTime.txt','r') as reader:
@@ -70,12 +70,12 @@ if __name__ == '__main__':
                     gameList.append(friendID)
                 number+=1
             pieArray=numpy.array(pieList)
-            pyplot.pie(pieArray,labels=pieFriendList,labeldistance=0.5,radius=1.2,rotatelabels=True)
-            pyplot.title('The friends of %s'%schoolID)
+            plt.pie(pieArray,labels=pieFriendList,labeldistance=0.5,radius=1.2,rotatelabels=True)
+            plt.title('The friends of %s'%schoolID)
 
             random.shuffle(gameList)
             print('随机抽取好友:%s'%','.join(gameList[:random.randint(3,7)]))
             if ifShow:
-                pyplot.show()
+                plt.show()
         except KeyError as e:
             print('输入错误，请重新输入！')

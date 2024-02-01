@@ -1,6 +1,6 @@
 import numpy
 from tools import *
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
 from datetime import *
 
 with open('../out/chattingAllMonths.txt','r') as reader:
@@ -32,9 +32,9 @@ def paint(schoolID):
     for key,value in data.items():
         xs.append(datetime.strptime(key,'%Y-%m').date())
         ys.append(value)
-    pyplot.plot_date(xs,ys,linestyle='-',marker='.')
-    pyplot.title(schoolID)
-    pyplot.show()
+    plt.plot_date(xs,ys,linestyle='-',marker='.')
+    plt.title(schoolID)
+    plt.show()
 
 if __name__ == '__main__':
     while True:

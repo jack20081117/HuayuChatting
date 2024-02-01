@@ -9,15 +9,13 @@ from jieba import analyse
 from keras.preprocessing.text import Tokenizer
 import tensorflow as tf
 from keras.models import Sequential,load_model
-from keras.layers import Dense,Dropout,Activation,Flatten,MaxPool1D,Conv1D,Embedding,BatchNormalization
+from keras.layers import Dense,Dropout,Activation,Flatten,MaxPool1D,Conv1D,Embedding,BatchNormalization,LSTM
 from matplotlib import pyplot as plt
-from sklearn.naive_bayes import MultinomialNB,GaussianNB,BernoulliNB
-from sklearn.ensemble import RandomForestClassifier
 
-ifLoadModel=True
+ifLoadModel=False
+ifuseCNN=True
+ifuseLSTM=False
 ifShowAcc=False
-useBayes=False#贝叶斯算法，效果不如CNN
-useRF=False#随机森林，效果不如CNN
 
 def label_dataset(row):
     num_label=label.index(row)
@@ -66,7 +64,9 @@ for i in progress:
     content=re.sub(r'@\S+','',content)
     content=content.replace('[表情]','')
     content=content.replace('[图片]','')
-    if len(content)<=5:
+    content=content.replace('[群签到]','')
+    content=content.replace('请使用手机QQ进行查看。','')
+    if len(content)<=10:
         continue
     dataframeJson.append(
         {
@@ -96,44 +96,64 @@ test_size=int(len(x_train)*0.8)
 x_test,y_test=x_train[test_size:],y_train[test_size:]
 
 maxLabel=max(dataframe['label'].to_list())
-if useRF:
-    logging.info('Building Random Forest Classifier...')
-    model=RandomForestClassifier(random_state=1,n_estimators=20,criterion='entropy',max_depth=8)
-    model.fit(x_train,y_train)
-    logging.info('模型得分:%s'%model.score(x_test,y_test))
-elif useBayes:
-     logging.info('Building Bayes Model...')
-     model=BernoulliNB()
-     model.fit(x_train,y_train)
-elif not ifLoadModel:
-    logging.info('Building CNN Model...')
-    model=Sequential()
-    model.add(Embedding(output_dim=32,input_dim=2000,input_length=20))
-    model.add(Conv1D(256,3,padding='same',activation='relu'))
-    model.add(MaxPool1D(3,3,padding='same'))
-    model.add(Conv1D(32,3,padding='same',activation='relu'))
-    model.add(Flatten())
-    model.add(Dropout(0.3))
-    model.add(BatchNormalization())
-    model.add(Dense(units=256,activation='relu'))
-    model.add(Dropout(0.2))
-    model.add(Dense(units=maxLabel+1,activation='softmax'))
+if not ifLoadModel:
+    if ifuseCNN:
+        logging.info('Building CNN Model...')
+        model=Sequential()
+        model.add(Embedding(output_dim=32,input_dim=2000,input_length=20))
+        model.add(Conv1D(256,3,padding='same',activation='relu'))
+        model.add(MaxPool1D(3,3,padding='same'))
+        model.add(Conv1D(128,3,padding='same',activation='relu'))
+        model.add(MaxPool1D(3,3,padding='same'))
+        model.add(Conv1D(32,3,padding='same',activation='relu'))
+        model.add(Flatten())
+        model.add(Dropout(0.3))
+        model.add(BatchNormalization())
+        model.add(Dense(units=256,activation='relu'))
+        model.add(Dropout(0.2))
+        model.add(Dense(units=maxLabel+1,activation='softmax'))
 
-    batchSize=256
-    epochs=5
+        batchSize=256
+        epochs=10
 
-    model.summary()
-    model.compile(loss='sparse_categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
+        model.summary()
+        model.compile(loss='sparse_categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 
-    history=model.fit(
-        x=x_train,
-        y=y_train,
-        batch_size=batchSize,
-        epochs=epochs,
-        validation_split=0.2
-    )
+        history=model.fit(
+            x=x_train,
+            y=y_train,
+            batch_size=batchSize,
+            epochs=epochs,
+            validation_split=0.2
+        )
 
-    model.save('mlp_text.h5')
+        model.save('mlp_cnn.h5')
+    elif ifuseLSTM:
+        logging.info('Building LSTM Model...')
+        model=Sequential()
+        model.add(Embedding(output_dim=32,input_dim=2000,input_length=20))
+        model.add(LSTM(units=256,return_sequences=True,input_dim=32,input_length=x_train.shape[1]))
+        model.add(LSTM(units=32))
+        model.add(Dense(units=256,activation='relu'))
+        model.add(Dense(units=maxLabel+1,activation='softmax'))
+
+        batchSize=256
+        epochs=5
+
+        model.summary()
+        model.compile(loss='sparse_categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
+
+        history=model.fit(
+            x=x_train,
+            y=y_train,
+            batch_size=batchSize,
+            epochs=epochs,
+            validation_split=0.2
+        )
+
+        model.save('mlp_lstm.h5')
+    else:
+        raise Exception('You must choose a model!')
 
     if ifShowAcc:
         plt.plot(history.history['accuracy'])
@@ -153,7 +173,12 @@ elif not ifLoadModel:
         plt.show()
 else:
     logging.info('Loading Model...')
-    model=load_model("mlp_text.h5")
+    if ifuseCNN:
+        model=load_model("mlp_cnn.h5")
+    elif ifuseLSTM:
+        model=load_model("mlp_lstm.h5")
+    else:
+        raise Exception("No model!")
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 s.bind(('127.0.0.1',9999))#通过TCP编程实现和机器人的通讯
@@ -193,11 +218,6 @@ else:
         sequence=token.texts_to_sequences([keyWordExtract(sentence)])
         sequence=tf.keras.preprocessing.sequence.pad_sequences(sequence,maxlen=20)
         prediction=model.predict(sequence)
-        if useBayes or useRF:
-            num=int(prediction)
-            schoolID=dataframe[dataframe.label==num]["schoolID"].to_list()[0]
-            print('schoolID:%s'%(schoolID))
-            continue
         l=list(prediction[0])
         num=l.index(max(l))
         schoolID=dataframe[dataframe.label==num]["schoolID"].to_list()[0]

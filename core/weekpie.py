@@ -1,6 +1,6 @@
-import numpy,xlwt
+import numpy
 from tools import *
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
 from datetime import *
 
 with open('../out/chattingAllWeeks.txt','r') as reader:
@@ -32,13 +32,13 @@ def paint(weekKey,nextKey):
     genders2pie=numpy.array(genders)
     freq2pie=numpy.array(freqList)
     schoolID2label=schoolIDList
-    pyplot.pie(freq2pie,labels=schoolID2label,labeldistance=0.5,radius=1.2,rotatelabels=True)
-    pyplot.title('%s~%s'%(weekKey[0:10],nextKey[0:10]))
-    pyplot.show()
+    plt.pie(freq2pie,labels=schoolID2label,labeldistance=0.5,radius=1.2,rotatelabels=True)
+    plt.title('%s~%s'%(weekKey[0:10],nextKey[0:10]))
+    plt.show()
 
-    pyplot.pie(genders2pie,labels=['boys','girls'],labeldistance=0.5,radius=1.2,rotatelabels=False)
-    pyplot.title('%s~%s'%(weekKey[0:10],nextKey[0:10]))
-    pyplot.show()
+    plt.pie(genders2pie,labels=['boys','girls'],labeldistance=0.5,radius=1.2,rotatelabels=False)
+    plt.title('%s~%s'%(weekKey[0:10],nextKey[0:10]))
+    plt.show()
 
 def getNextWeekKey(weekKey):
     week=datetime.strptime(weekKey,'%Y-%m-%d %H:%M:%S')

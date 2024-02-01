@@ -1,6 +1,6 @@
 import numpy
 from tools import *
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
 from datetime import *
 
 with open('../out/chattingAllWeeks.txt','r') as reader:
@@ -52,10 +52,10 @@ def decayedPaint1(schoolID):
         _key=key
         xs.append(datetime.strptime(key[0:10],'%Y-%m-%d').date())
         ys.append(value)
-    pyplot.figure(figsize=(10,5))
-    pyplot.plot_date(xs,ys,linestyle='-',marker='.')
-    pyplot.title(schoolID)
-    pyplot.show()
+    plt.figure(figsize=(10,5))
+    plt.plot_date(xs,ys,linestyle='-',marker='.')
+    plt.title(schoolID)
+    plt.show()
 
 def decayedPaint2(weekKey,nextKey):
     decayedWeeks2schoolID:dict[str,dict[str,float]]={}
@@ -75,9 +75,9 @@ def decayedPaint2(weekKey,nextKey):
     for t in sortedValue:
         xs.append(t[0])
         ys.append(t[1])
-    pyplot.bar(xs,ys)
-    pyplot.title('%s~%s'%(weekKey[:10],nextKey[:10]))
-    pyplot.show()
+    plt.bar(xs,ys)
+    plt.title('%s~%s'%(weekKey[:10],nextKey[:10]))
+    plt.show()
 
 def getNextWeekKey(weekKey):
     week=datetime.strptime(weekKey,'%Y-%m-%d %H:%M:%S')

@@ -1,6 +1,8 @@
 import numpy
 from datetime import datetime
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
+plt.rcParams['font.family']=['Microsoft YaHei']
+
 from argparse import ArgumentParser
 from tools import *
 
@@ -38,7 +40,7 @@ for weekKey in chattingAllWeeks:
             weekIDFreqDict[weekKey]={}
         weekIDFreqDict[weekKey][schoolID]=freq
 
-xs,ys=[],[]
+xs,raw_ys,ys=[],[],[]
 
 for weekKey in chattingAllWeeks:
     weekValue=weekIDFreqDict[weekKey]
@@ -48,7 +50,15 @@ for weekKey in chattingAllWeeks:
         if schoolID[0]=='u':decline-=weekIDFreqDict[weekKey][schoolID]
         else:ageSum+=int(schoolID[:2])*weekIDFreqDict[weekKey][schoolID]
     xs.append(datetime.strptime(weekKey[0:10],'%Y-%m-%d').date())
-    ys.append(ageSum/decline)
+    raw_ys.append(ageSum/decline)
+    ys.append(0)
+for i in range(len(raw_ys)):
+    if i==0:
+        ys[i]=(raw_ys[i]+raw_ys[i+1])/2
+    elif i==len(raw_ys)-1:
+        ys[i]=(raw_ys[i]+raw_ys[i-1])/2
+    else:
+        ys[i]=(raw_ys[i-1]+raw_ys[i]+raw_ys[i+1])/3
 
 start,end=19,24
 
@@ -57,11 +67,13 @@ _ys1=[i for i in range(start,end)]
 _ys2=[i for i in range(start+4,end+4)]
 
 if __name__ == '__main__':
-    pyplot.figure(figsize=(10,5))
-    pyplot.plot_date(xs,ys,linestyle='-',marker='.')
-    pyplot.plot(_xs,_ys1,linestyle='-')
-    pyplot.plot(_xs,_ys2,linestyle='-')
-    pyplot.title('AgeChart')
+    plt.figure(figsize=(10,5))
+    plt.plot_date(xs,ys,linestyle='-',marker='.',label='average')
+    plt.plot_date(xs,raw_ys,linestyle='--',marker=',',c='orange',label='raw')
+    plt.plot(_xs,_ys1,linestyle='-',c='red',label='毕业线')
+    plt.plot(_xs,_ys2,linestyle='-',c='green',label='入学线')
+    plt.title('AgeChart')
+    plt.legend()
 
     parser=ArgumentParser()
     parser.add_argument(
@@ -71,6 +83,6 @@ if __name__ == '__main__':
     args=parser.parse_args()
     save=args.save
     if save=='True':
-        pyplot.savefig("./static/img/agechart.png")
+        plt.savefig("./static/img/agechart.png")
     else:
-        pyplot.show()
+        plt.show()

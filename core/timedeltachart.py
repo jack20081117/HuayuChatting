@@ -1,5 +1,5 @@
 import numpy
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
 from tools import *
 
 with open('../out/timeDeltas.txt','r') as reader:
@@ -17,12 +17,12 @@ def paint1():
         ys.append(timeDelta)
     NPxs=numpy.array(xs)
     NPys=numpy.array(ys)
-    pyplot.plot(NPxs,NPys)
-    pyplot.show()
+    plt.plot(NPxs,NPys)
+    plt.show()
     sortedTimeDeltas=sorted(timeDeltas,key=lambda delta:delta,reverse=True)
     sortedNPys=numpy.array(sortedTimeDeltas)
-    pyplot.plot(NPxs,sortedNPys)
-    pyplot.show()
+    plt.plot(NPxs,sortedNPys)
+    plt.show()
 
 def paint2():
     xs=[]
@@ -33,8 +33,8 @@ def paint2():
         ys.append(int(t[1]))
     NPxs=numpy.array(xs)
     NPys=numpy.array(ys)
-    pyplot.bar(NPxs,NPys)
-    pyplot.show()
+    plt.bar(NPxs,NPys)
+    plt.show()
 
 if __name__ == '__main__':
     paint1()
